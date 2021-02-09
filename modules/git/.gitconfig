@@ -1,0 +1,43 @@
+[alias]
+  amend = commit --amend --no-edit
+  b = branch
+  c = commit
+  fix = "!git commit --fixup=${1} #"
+  l = log --abbrev-commit --color --date=relative --graph
+  please = push --force-with-lease
+  s = status --short
+  sw = switch
+
+[apply]
+  whitespace = fix # Automatically fix whitespace errors when applying a patch
+
+[color]
+  ui = auto
+
+[core]
+  editor = nvim
+  excludesfile = ~/.gitignore
+  untrackedCache = true # Speed up commands involving untracked files (such as `git status`)
+  whitespace = trailing-space # https://www.git-scm.com/book/en/v2/Customizing-Git-Git-Configuration#_core_whitespace
+
+[help]
+	autocorrect = 1 # Automatically correct and execute mistyped commands
+
+[init]
+  defaultBranch = main
+
+[merge]
+  conflictstyle = diff3
+
+[pull]
+  rebase = true
+
+[push]
+  default = current
+
+[rebase]
+  autosquash = true
+
+[user]
+  name = Remy DUTHU
+  email = remy.duthu@gmail.com
