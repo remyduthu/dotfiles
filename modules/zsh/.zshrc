@@ -64,7 +64,7 @@ alias g="git"
 alias k="kubectl"
 alias ll="ls -l"
 alias la="ls -al"
-
+alias v="nvim"
 
 # Functions
 #
