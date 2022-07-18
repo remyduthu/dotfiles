@@ -10,6 +10,7 @@ brew "kubernetes-cli"
 brew "kubeseal"
 brew "mkcert"
 brew "neovim"
+brew "nmap"
 brew "node" # This installs `npm` too using the recommended installation method
 brew "pnpm"
 brew "tldr"
