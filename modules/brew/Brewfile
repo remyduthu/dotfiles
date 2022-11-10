@@ -14,6 +14,8 @@ brew "nmap"
 brew "node" # This installs `npm` too using the recommended installation method
 brew "pnpm"
 brew "tldr"
+brew "vagrant"
+brew "virtualbox"
 brew "yarn"
 brew "z"
 brew "zsh-autosuggestions"
