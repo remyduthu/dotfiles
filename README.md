@@ -4,12 +4,16 @@ This project is inspired by [Nyalab](https://github.com/Nyalab/handles), [mathia
 
 ## Procedure
 
+- Execute the [`export.zsh`](./export.zsh) script.
 - [Install a fresh copy of macOS](https://support.apple.com/en-gb/HT212749).
 - Perform the inital configuration until you can use the system.
 - [Install Dashlane](https://www.dashlane.com/download).
 - Download this repository.
 - Execute the [`run.zsh`](./run.zsh) script without arguments to configure the entire system.
-- Follow the ["Hardening macOS"](https://www.bejarano.io/hardening-macos/) guide. Some parameters are already set but others cannot be configured dynamically.
+- Follow the ["Hardening macOS"](https://www.bejarano.io/hardening-macos/) guide[^*].
+- Configure native applications (Mail, Safari, etc.)[^*].
+
+[^*]: Some parameters are already set but others cannot be configured dynamically.
 
 ## Modules
 
@@ -21,7 +25,7 @@ This project is splitted into modules. Each module vaguely represents a tool.
 
 - Keep only the dependencies listed in the [Brewfile](`./modules/brew/Brewfile`):
 
-  ```
+  ```zsh
   brew bundle cleanup --file="${DOTFILES_PATH}/modules/brew/Brewfile" --force --zap
   ```
 
@@ -29,7 +33,3 @@ This project is splitted into modules. Each module vaguely represents a tool.
 
 - Lint ZSH scripts
 - Download Git repositories
-- Write `backup.zsh` script to:
-  - Save SSH keys
-  - Save `kubectl` configuration files (~/.kube)
-  - Save pictures (~/Pictures/)
