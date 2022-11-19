@@ -1,42 +1,45 @@
 {
+  "explorer.confirmDragAndDrop": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.fontFamily": "Fira Code",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 12,
+  "editor.formatOnSave": true,
+  "editor.quickSuggestions": {
+    "comments": "inline",
+    "other": "inline",
+    "strings": "inline"
+  },
+  "editor.stickyScroll.enabled": true,
+
+  "go.buildFlags": ["-tags=e2e"],
+  "go.lintFlags": ["--fast"],
+  "go.lintTool": "golangci-lint",
+  "go.testTags": "e2e",
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.find.seedSearchStringFromSelection": "never",
-  "editor.fontFamily": "Fira Code",
-  "editor.fontLigatures": true,
-  "editor.fontSize": 13,
-  "editor.formatOnSave": true,
-  "editor.minimap.enabled": false,
-  "editor.rulers": [80],
-  "explorer.confirmDragAndDrop": false,
-  "extensions.ignoreRecommendations": true,
-  "files.associations": {
-    "*.yml": "yaml",
-    "*.yaml": "yaml"
-  },
-  "redhat.telemetry.enabled": false,
   "security.workspace.trust.untrustedFiles": "open",
-  "workbench.activityBar.visible": false,
-  "workbench.colorTheme": "Dracula",
-  "workbench.iconTheme": "vs-minimal",
-  "workbench.layoutControl.enabled": false,
-  "workbench.startupEditor": "none",
-  "workbench.statusBar.visible": false,
-  "yaml.schemas": {
-    "https://json.schemastore.org/kustomization": "kustomization.yaml",
-    "kubernetes": [
-      "components/**",
-      "resources/**",
-      "deploy/**",
-      "!deploy/config/**",
-      "!kustomization.yaml"
-    ],
-    "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
-    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.*"
-  }
+  "workbench.colorTheme": "Solarized Light+",
+  "workbench.iconTheme": "vs-minimal"
+
+  // "files.associations": {
+  //   "*.yaml": "ansible"
+  //   // "*.yaml": "yaml",
+  //   // "*.yml": "yaml"
+  // },
+
+  // "redhat.telemetry.enabled": false,
+  // "yaml.schemas": {
+  //   "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
+  //   "https://json.schemastore.org/kustomization": "kustomization.yaml",
+  //   "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.*",
+  //   "kubernetes": [
+  //     "components/**",
+  //     "resources/**",
+  //     "deploy/**",
+  //     "!config/**",
+  //     "!kustomization.yaml"
+  //   ]
+  // },
 }

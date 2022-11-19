@@ -87,7 +87,7 @@ compdef _kplain kplain
 
 # Pretty print Kubernetes secrets
 function kplain {
-  kubectl get secret "${1}" --output=go-template='{{range $key, $value := .data}}{{printf "%s: %s\n" $key ($value | base64decode)}}{{end}}'
+  kubectl get secret "${1}" --output=go-template='{{range $key, $value := .data}}{{printf "%s=%s\n" $key ($value | base64decode)}}{{end}}'
 }
 
 function _kplain {
@@ -99,8 +99,17 @@ function _kplain {
 
 export EDITOR="nvim"
 
+# https://github.com/drduh/macOS-Security-and-Privacy-Guide#homebrew
+export HOMEBREW_CASK_OPTS="--require-sha"
+export HOMEBREW_NO_ANALYTICS="1"
+export HOMEBREW_NO_INSECURE_REDIRECT="1"
+
 export LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
 
+export PNPM_HOME="${HOME}/Library/pnpm"
+
+export PATH="${PATH}:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 export PATH="${PATH}:${HOME}/.krew/bin"
-export PATH="${PATH}:${HOME}/dev/loungeup/next/scripts"
-export PATH="${PATH}:${HOME}/go/bin"
+export PATH="${PATH}:${HOME}/dev/loungeup/next/scripts" # TODO(remyduthu): Match subdirectories.
+export PATH="${PATH}:$(go env GOPATH)/bin"
+export PATH="${PATH}:${PNPM_HOME}"

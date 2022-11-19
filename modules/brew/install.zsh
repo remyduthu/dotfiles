@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-
 set -eu
 
 STAGE="brew"
@@ -7,6 +6,9 @@ STAGE="brew"
 source "${DOTFILES_PATH}"/src/*.zsh
 
 require "brew"
+
+taskf "Disable analytics"
+brew analytics off
 
 taskf "Install dependencies"
 brew update

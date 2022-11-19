@@ -1,0 +1,13 @@
+Host *
+  Compression yes
+  ControlMaster auto
+  ControlPath ~/.ssh/sockets/%r@%h:%p
+  ControlPersist 1h
+  ForwardX11Trusted no
+  IgnoreUnknown UseKeychain
+  Protocol 2
+  ServerAliveCountMax 10
+  ServerAliveInterval 20
+  StrictHostKeyChecking ask
+  TCPKeepAlive yes
+  UseKeychain yes
