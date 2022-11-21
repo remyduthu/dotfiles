@@ -1057,6 +1057,10 @@
 			<string>/Users/remyduthu</string>
 		</dict>
 	</array>
+	<key>PromptOnQuit</key>
+	<false/>
+	<key>QuitWhenAllWindowsClosed</key>
+	<false/>
 	<key>SoundForEsc</key>
 	<false/>
 	<key>TabStyleWithAutomaticOption</key>
