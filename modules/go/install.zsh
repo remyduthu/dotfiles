@@ -10,3 +10,4 @@ require "go"
 
 taskf "Install dependencies"
 go install github.com/catilac/plistwatch@latest
+go install golang.org/x/tools/gopls@latest
