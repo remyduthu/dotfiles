@@ -180,6 +180,10 @@
     }
   },
   "shortcuts": {
+    "center": {
+      "keyCode": 8,
+      "modifierFlags": 786432
+    },
     "leftHalf": {
       "keyCode": 123,
       "modifierFlags": 786432
