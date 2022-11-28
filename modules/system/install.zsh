@@ -46,3 +46,6 @@ for app in "Dock" "Finder" "Safari" "SystemUIServer"
 do
   killall "${app}" &> /dev/null
 done
+
+taskf "Link configuration files"
+sudo cp "${DOTFILES_PATH}/modules/ssh/hosts" "/etc/hosts"
