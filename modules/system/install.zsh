@@ -42,10 +42,12 @@ defaults write "com.apple.Safari" "AutoOpenSafeDownloads" -boolean false
 defaults write "com.apple.Terminal" "SecureKeyboardEntry" -boolean true
 defaults write "com.googlecode.iterm2" "Secure Input" -boolean true
 
+set +x
+
 for app in "Dock" "Finder" "Safari" "SystemUIServer"
 do
-  killall "${app}" &> /dev/null
+  killall "${app}" || true
 done
 
 taskf "Link configuration files"
-sudo cp "${DOTFILES_PATH}/modules/ssh/hosts" "/etc/hosts"
+sudo cp "${DOTFILES_PATH}/modules/system/hosts" "/etc/hosts" || true
