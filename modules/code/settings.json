@@ -11,7 +11,13 @@
     "strings": "inline"
   },
   "editor.stickyScroll.enabled": true,
+  "extensions.ignoreRecommendations": true,
+  "workbench.colorTheme": "Solarized Light+",
+  "workbench.iconTheme": "vs-minimal",
+  "workbench.startupEditor": "none",
+  "security.workspace.trust.untrustedFiles": "open",
 
+  // Go
   "go.buildFlags": ["-tags=e2e"],
   "go.lintFlags": ["--fast"],
   "go.lintTool": "golangci-lint",
@@ -19,9 +25,13 @@
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
-  "security.workspace.trust.untrustedFiles": "open",
-  "workbench.colorTheme": "Solarized Light+",
-  "workbench.iconTheme": "vs-minimal"
+
+  // YAML
+  "redhat.telemetry.enabled": false,
+  "yaml.schemas": {
+    "https://json.schemastore.org/kustomization": "kustomization.yaml",
+    "kubernetes": ["deploy/**", "!kustomization.yaml"]
+  }
 
   // "files.associations": {
   //   "*.yaml": "ansible"
@@ -29,10 +39,8 @@
   //   // "*.yml": "yaml"
   // },
 
-  // "redhat.telemetry.enabled": false,
   // "yaml.schemas": {
   //   "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
-  //   "https://json.schemastore.org/kustomization": "kustomization.yaml",
   //   "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.*",
   //   "kubernetes": [
   //     "components/**",
