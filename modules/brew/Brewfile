@@ -1,5 +1,6 @@
 brew "ansible"
 brew "curl"
+brew "dive"
 brew "exa"
 brew "git"
 brew "go"
