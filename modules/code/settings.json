@@ -6,9 +6,9 @@
   "editor.fontSize": 12,
   "editor.formatOnSave": true,
   "editor.quickSuggestions": {
-    "comments": "inline",
-    "other": "inline",
-    "strings": "inline"
+    "comments": "on",
+    "other": "on",
+    "strings": "on"
   },
   "editor.stickyScroll.enabled": true,
   "extensions.ignoreRecommendations": true,
@@ -29,6 +29,7 @@
   // YAML
   "redhat.telemetry.enabled": false,
   "yaml.schemas": {
+    "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
     "https://json.schemastore.org/kustomization": "kustomization.yaml",
     "kubernetes": ["deploy/**", "!kustomization.yaml"]
   }
