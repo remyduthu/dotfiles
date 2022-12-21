@@ -10,7 +10,7 @@
     "other": "on",
     "strings": "on"
   },
-  "editor.stickyScroll.enabled": true,
+  "editor.rulers": [80],
   "extensions.ignoreRecommendations": true,
   "workbench.colorTheme": "Solarized Light+",
   "workbench.iconTheme": "vs-minimal",
@@ -29,26 +29,15 @@
   // YAML
   "redhat.telemetry.enabled": false,
   "yaml.schemas": {
-    "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
+    "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": [
+      ".gitlab-ci.yml",
+      ".gitlab-ci.yaml"
+    ],
     "https://json.schemastore.org/kustomization": "kustomization.yaml",
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
+      "docker-compose.yml",
+      "docker-compose.yaml"
+    ],
     "kubernetes": ["deploy/**", "!kustomization.yaml"]
   }
-
-  // "files.associations": {
-  //   "*.yaml": "ansible"
-  //   // "*.yaml": "yaml",
-  //   // "*.yml": "yaml"
-  // },
-
-  // "yaml.schemas": {
-  //   "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": ".gitlab-ci.*",
-  //   "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.*",
-  //   "kubernetes": [
-  //     "components/**",
-  //     "resources/**",
-  //     "deploy/**",
-  //     "!config/**",
-  //     "!kustomization.yaml"
-  //   ]
-  // },
 }
