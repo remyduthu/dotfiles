@@ -18,7 +18,7 @@ defaults write "Apple Global Domain" "InitialKeyRepeat" -int 15
 defaults write "Apple Global Domain" "KeyRepeat" -int 2
 
 # Screen
-defaults write "Apple Global Domain" "AppleFontSmoothing" -int 2 # https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
+defaults write -g CGFontRenderingFontSmoothingDisabled -bool false
 
 # Dock
 defaults write "com.apple.dock" "autohide-delay" -float 0
