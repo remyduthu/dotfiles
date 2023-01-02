@@ -2,5 +2,20 @@
   "Add Personal TODO": {
     "body": "TODO(remyduthu): ",
     "prefix": "todo"
+  },
+  "Test": {
+    "body": [
+      "func Test${1:Xxx}(t *testing.T) {",
+      "\ttestCases := map[string]struct{}{}",
+      "",
+      "\tfor testName, testCase := range testCases {",
+      "\t\tt.Run(testName, func(t *testing.T) {",
+      "",
+      "\t\t})",
+      "\t}",
+      "}"
+    ],
+    "scope": "go",
+    "prefix": "func Test"
   }
 }
