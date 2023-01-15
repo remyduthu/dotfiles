@@ -13,9 +13,8 @@ osascript -e 'tell application "System Preferences" to quit'
 set -x # Show commands
 
 # Keyboard
-defaults write "Apple Global Domain" "AppleKeyboardUIMode" -int 3 # Enable full keyboard access for all controls (e.g. enable Tab in modal dialogs)
-defaults write "Apple Global Domain" "InitialKeyRepeat" -int 15
-defaults write "Apple Global Domain" "KeyRepeat" -int 2
+defaults write "Apple Global Domain" "InitialKeyRepeat" -int 25
+defaults write "Apple Global Domain" "KeyRepeat" -int 5
 
 # Screen
 defaults write -g CGFontRenderingFontSmoothingDisabled -bool false
