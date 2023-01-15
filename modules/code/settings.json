@@ -5,6 +5,7 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 12,
   "editor.formatOnSave": true,
+  "editor.lineNumbers": "relative",
   "editor.quickSuggestions": {
     "comments": "on",
     "other": "on",
@@ -26,6 +27,12 @@
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
+
+  // Neovim
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1 // Run extension in its own thread.
+  },
+  "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
 
   // YAML
   "redhat.telemetry.enabled": false,

@@ -2,8 +2,6 @@ set nocompatible
 
 set modelines=0  " https://alioth-lists-archive.debian.net/pipermail/pkg-vim-maintainers/2007-June/004020.html
 
-set number relativenumber
-
 " http://vimcasts.org/episodes/tabs-and-spaces/
 set tabstop=2
 set softtabstop=2
