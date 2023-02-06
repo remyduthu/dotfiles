@@ -15,13 +15,13 @@ for extension in \
   "EditorConfig.EditorConfig" \
   "esbenp.prettier-vscode" \
   "golang.Go" \
-  "MS-vsliveshare.vsliveshare-pack" \
+  "MS-vsliveshare.vsliveshare" \
   "redhat.ansible" \
   "redhat.vscode-yaml" \
   "ryanolsonx.solarized" \
   "timonwong.shellcheck"
 do
-  code --install-extension "${extension}" || true # Ignore errors.
+  code --force --install-extension "${extension}" || true # Ignore errors.
 done
 
 taskf "Link configuration files"
