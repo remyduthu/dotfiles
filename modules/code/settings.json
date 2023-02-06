@@ -11,7 +11,7 @@
     "other": "on",
     "strings": "on"
   },
-  "editor.rulers": [80],
+  "editor.rulers": [120],
   "extensions.ignoreRecommendations": true,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Solarized Light+",
@@ -46,6 +46,7 @@
       "docker-compose.yml",
       "docker-compose.yaml"
     ],
-    "kubernetes": ["deploy/**", "!kustomization.yaml"]
+    "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
+    "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
   }
 }
