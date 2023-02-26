@@ -14,7 +14,7 @@
   "editor.rulers": [120],
   "extensions.ignoreRecommendations": true,
   "workbench.activityBar.visible": false,
-  "workbench.colorTheme": "Solarized Light+",
+  "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "vs-minimal",
   "workbench.startupEditor": "none",
   "security.workspace.trust.untrustedFiles": "open",
