@@ -12,9 +12,13 @@ taskf "Install extensions"
 for extension in \
   "bmewburn.vscode-intelephense-client" \
   "dbaeumer.vscode-eslint" \
+  "dracula-theme.theme-dracula" \
+  "eamodio.gitlens" \
   "EditorConfig.EditorConfig" \
   "esbenp.prettier-vscode" \
   "golang.Go" \
+  "hashicorp.hcl" \
+  "lokalise.i18n-ally" \
   "MS-vsliveshare.vsliveshare" \
   "redhat.ansible" \
   "redhat.vscode-yaml" \
@@ -22,6 +26,15 @@ for extension in \
   "timonwong.shellcheck"
 do
   code --force --install-extension "${extension}" || true # Ignore errors.
+done
+
+taskf "Disable extensions"
+for extension in \
+  "eamodio.gitlens" \
+  "lokalise.i18n-ally" \
+  "MS-vsliveshare.vsliveshare"
+do
+  code --force --disable-extension "${extension}" || true # Ignore errors.
 done
 
 taskf "Link configuration files"
