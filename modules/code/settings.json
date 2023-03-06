@@ -48,5 +48,10 @@
     ],
     "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
     "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
+  },
+
+  // Python
+  "[python]": {
+    "editor.formatOnType": true
   }
 }
