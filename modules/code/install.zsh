@@ -10,6 +10,7 @@ require "code"
 
 taskf "Install extensions"
 for extension in \
+  "asvetliakov.vscode-neovim" \
   "bmewburn.vscode-intelephense-client" \
   "dbaeumer.vscode-eslint" \
   "dracula-theme.theme-dracula" \
@@ -40,3 +41,6 @@ done
 taskf "Link configuration files"
 link "${DOTFILES_PATH}/modules/code/settings.json" "${HOME}/Library/Application Support/Code/User/settings.json"
 link "${DOTFILES_PATH}/modules/code/snippets.code-snippets" "${HOME}/Library/Application Support/Code/User/snippets/snippets.code-snippets"
+
+# https://github.com/vscode-neovim/vscode-neovim#vscode-configuration
+defaults write "com.microsoft.VSCode" "ApplePressAndHoldEnabled" -boolean false
