@@ -3,7 +3,7 @@
     "body": "TODO(remyduthu): ",
     "prefix": "todo"
   },
-  "Test": {
+  "Go Test": {
     "body": [
       "func Test${1:Xxx}(t *testing.T) {",
       "\ttests := map[string]struct{}{}",
