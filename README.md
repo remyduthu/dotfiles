@@ -6,7 +6,7 @@ This project is inspired by [Nyalab](https://github.com/Nyalab/handles), [mathia
 
 - Execute the [`export.zsh`](./export.zsh) script.
 - [Install a fresh copy of macOS](https://support.apple.com/en-gb/HT212749).
-- Perform the inital configuration until you can use the system.
+- Perform the initial configuration until you can use the system.
 - [Install Dashlane](https://www.dashlane.com/download).
 - Download this repository.
 - Execute the [`run.zsh`](./run.zsh) script without arguments to configure the entire system.

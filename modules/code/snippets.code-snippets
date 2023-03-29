@@ -6,10 +6,10 @@
   "Test": {
     "body": [
       "func Test${1:Xxx}(t *testing.T) {",
-      "\ttestCases := map[string]struct{}{}",
+      "\ttests := map[string]struct{}{}",
       "",
-      "\tfor testName, testCase := range testCases {",
-      "\t\tt.Run(testName, func(t *testing.T) {",
+      "\tfor test, tt := range tests {",
+      "\t\tt.Run(test, func(t *testing.T) {",
       "",
       "\t\t})",
       "\t}",
