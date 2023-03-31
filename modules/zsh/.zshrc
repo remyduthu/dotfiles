@@ -94,6 +94,10 @@ function _kplain {
   _alternative "1: :($(kubectl get secrets --output=go-template='{{range .items}}{{printf "%s\n" .metadata.name}}{{end}}'))"
 }
 
+function kpods() {
+  kubectl get pods --selector="app.kubernetes.io/name=${1}" "${@:2}"
+}
+
 # Exports
 #
 
