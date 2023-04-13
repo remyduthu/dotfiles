@@ -14,9 +14,6 @@ autoload -Uz compinit; compinit
 # Completion
 #
 
-# Load the completion files
-fpath+="${HOME}/.zsh/completion"
-
 # Case-insensitive
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
@@ -86,11 +83,11 @@ function _kns() {
 compdef _kplain kplain
 
 # Pretty print Kubernetes secrets
-function kplain {
+function kplain() {
   kubectl get secret "${1}" --output=go-template='{{range $key, $value := .data}}{{printf "%s=%s\n" $key ($value | base64decode)}}{{end}}'
 }
 
-function _kplain {
+function _kplain() {
   _alternative "1: :($(kubectl get secrets --output=go-template='{{range .items}}{{printf "%s\n" .metadata.name}}{{end}}'))"
 }
 
@@ -114,6 +111,6 @@ export PNPM_HOME="${HOME}/Library/pnpm"
 
 export PATH="${PATH}:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 export PATH="${PATH}:${HOME}/.krew/bin"
-export PATH="${PATH}:${HOME}/dev/loungeup/next/scripts" # TODO(remyduthu): Match subdirectories.
+export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirectories.
 export PATH="${PATH}:$(go env GOPATH)/bin"
 export PATH="${PATH}:${PNPM_HOME}"
