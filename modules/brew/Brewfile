@@ -1,4 +1,5 @@
 brew "ansible"
+brew "ansible-lint"
 brew "curl"
 brew "dive"
 brew "exa"
