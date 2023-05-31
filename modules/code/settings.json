@@ -1,5 +1,4 @@
 {
-  "explorer.confirmDragAndDrop": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily": "Fira Code",
   "editor.fontLigatures": true,
@@ -12,12 +11,21 @@
     "strings": "on"
   },
   "editor.rulers": [120],
+  "explorer.confirmDragAndDrop": false,
   "extensions.ignoreRecommendations": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "window.commandCenter": false,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "vs-minimal",
+  "workbench.layoutControl.enabled": false,
+  "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
-  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.statusBar.visible": false,
+
+  // Git
+  "diffEditor.diffAlgorithm": "advanced",
+  "git.openRepositoryInParentFolders": "always",
 
   // Go
   "go.buildFlags": ["-tags=e2e"],
@@ -28,11 +36,16 @@
     "editor.defaultFormatter": "golang.go"
   },
 
-  // Neovim
+  // NVim
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1 // Run extension in its own thread.
   },
-  "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
+  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+
+  // Python
+  "[python]": {
+    "editor.formatOnType": true
+  },
 
   // YAML
   "redhat.telemetry.enabled": false,
@@ -48,10 +61,5 @@
     ],
     "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
     "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
-  },
-
-  // Python
-  "[python]": {
-    "editor.formatOnType": true
   }
 }
