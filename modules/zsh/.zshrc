@@ -19,6 +19,7 @@ zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
 # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
 source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+bindkey '^[[Z' autosuggest-accept
 
 # https://github.com/rupa/z
 source "$(brew --prefix)/etc/profile.d/z.sh"
@@ -65,6 +66,13 @@ alias v="nvim"
 
 # Functions
 #
+
+function gupdate() {
+  DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+
+  git fetch origin "${DEFAULT_BRANCH}:${DEFAULT_BRANCH}"
+  git rebase "${DEFAULT_BRANCH}"
+}
 
 compdef _kns kns
 
