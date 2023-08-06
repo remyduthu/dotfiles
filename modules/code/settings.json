@@ -4,7 +4,7 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 12,
   "editor.formatOnSave": true,
-  "editor.lineNumbers": "relative",
+  "editor.inlineSuggest.enabled": true,
   "editor.quickSuggestions": {
     "comments": "on",
     "other": "on",
@@ -19,7 +19,6 @@
   "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
-  "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.statusBar.visible": false,
 
