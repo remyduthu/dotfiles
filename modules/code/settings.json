@@ -15,8 +15,7 @@
   "extensions.ignoreRecommendations": true,
   "security.workspace.trust.untrustedFiles": "open",
   "window.commandCenter": false,
-  "workbench.activityBar.visible": false,
-  "workbench.colorTheme": "Dracula",
+  "workbench.colorTheme": "Solarized Light+",
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.startupEditor": "none",
@@ -60,5 +59,20 @@
     ],
     "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
     "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
-  }
+  },
+
+  // Project Manager
+  "projectManager.any.baseFolders": [
+    "~/dev/next/services/",
+    "~/dev/next/projects/"
+  ],
+  "projectManager.any.maxDepthRecursion": 1,
+  "projectManager.git.baseFolders": ["~/dev/"],
+  "projectManager.hg.ignoredFolders": ["node_modules", "out", "test", "vendor"],
+  "projectManager.vscode.ignoredFolders": [
+    "node_modules",
+    "out",
+    "test",
+    "vendor"
+  ]
 }
