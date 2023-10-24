@@ -12,7 +12,7 @@ set encoding=utf-8
 
 let mapleader=","
 
-set ignorecase smartcase incsearch showmatch hlsearch
+set ignorecase incsearch showmatch hlsearch
 nnoremap <leader><space> :noh<cr>
 nnoremap <tab> %
 vnoremap <tab> %
