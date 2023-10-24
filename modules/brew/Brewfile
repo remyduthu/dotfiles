@@ -26,7 +26,6 @@ brew "zsh-autosuggestions"
 
 cask_args appdir: "/Applications"
 cask "cleanmymac"
-cask "docker"
 cask "homebrew/cask-fonts/font-fira-code"
 cask "insomnia"
 cask "iterm2"
