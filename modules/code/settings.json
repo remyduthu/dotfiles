@@ -5,6 +5,7 @@
   "editor.fontSize": 12,
   "editor.formatOnSave": true,
   "editor.inlineSuggest.enabled": true,
+  "editor.minimap.enabled": false,
   "editor.quickSuggestions": {
     "comments": "on",
     "other": "on",
@@ -44,6 +45,9 @@
   "[python]": {
     "editor.formatOnType": true
   },
+
+  // TS
+  "typescript.preferences.importModuleSpecifier": "non-relative",
 
   // YAML
   "redhat.telemetry.enabled": false,
