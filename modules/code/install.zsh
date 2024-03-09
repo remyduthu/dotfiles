@@ -10,20 +10,20 @@ require "code"
 
 taskf "Install extensions"
 for extension in \
+  "alefragnani.project-manager" \
   "asvetliakov.vscode-neovim" \
   "bmewburn.vscode-intelephense-client" \
   "dbaeumer.vscode-eslint" \
   "dracula-theme.theme-dracula" \
   "eamodio.gitlens" \
-  "EditorConfig.EditorConfig" \
+  "editorconfig.editorconfig" \
   "esbenp.prettier-vscode" \
-  "golang.Go" \
-  "hashicorp.hcl" \
-  "lokalise.i18n-ally" \
-  "MS-vsliveshare.vsliveshare" \
-  "redhat.ansible" \
+  "github.copilot" \
+  "github.copilot-chat" \
+  "golang.go" \
+  "ms-vsliveshare.vsliveshare" \
+  "redhat.vscode-xml" \
   "redhat.vscode-yaml" \
-  "ryanolsonx.solarized" \
   "timonwong.shellcheck"
 do
   code --force --install-extension "${extension}" || true # Ignore errors.
@@ -31,9 +31,7 @@ done
 
 taskf "Disable extensions"
 for extension in \
-  "eamodio.gitlens" \
-  "lokalise.i18n-ally" \
-  "MS-vsliveshare.vsliveshare"
+  "ms-vsliveshare.vsliveshare"
 do
   code --force --disable-extension "${extension}" || true # Ignore errors.
 done
