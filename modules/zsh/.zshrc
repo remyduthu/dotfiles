@@ -57,6 +57,7 @@ alias grep='egrep --color="auto"'
 alias ls="exa"
 
 # Shortcuts
+alias b="brew"
 alias d="docker"
 alias g="git"
 alias k="kubectl"
@@ -66,6 +67,16 @@ alias v="nvim"
 
 # Functions
 #
+
+function bprune() {
+  brew uninstall --force --zap "${1}"
+}
+
+function _bprune() {
+  _alternative "1: :($(brew list))"
+}
+
+compdef _bprune bprune
 
 function gupdate() {
   DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
