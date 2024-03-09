@@ -16,21 +16,22 @@
   "extensions.ignoreRecommendations": true,
   "security.workspace.trust.untrustedFiles": "open",
   "window.commandCenter": false,
+  "workbench.activityBar.location": "top",
   "workbench.colorTheme": "Dracula",
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.startupEditor": "none",
-  "workbench.statusBar.visible": false,
 
   // Git
   "diffEditor.diffAlgorithm": "advanced",
   "git.openRepositoryInParentFolders": "always",
 
   // Go
-  "go.buildFlags": ["-tags=e2e"],
+  "go.coverOnSingleTest": true,
+  "go.coverOnSingleTestFile": true,
   "go.lintFlags": ["--fast"],
   "go.lintTool": "golangci-lint",
-  "go.testTags": "e2e",
+  "go.testFlags": ["-v"],
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
@@ -43,7 +44,7 @@
 
   // Python
   "[python]": {
-    "editor.formatOnType": true
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
 
   // TS
@@ -63,6 +64,11 @@
     ],
     "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
     "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
+  },
+
+  // XML
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
   },
 
   // Project Manager

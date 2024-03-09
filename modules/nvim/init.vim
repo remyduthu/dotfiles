@@ -8,6 +8,8 @@ set softtabstop=2
 set shiftwidth=2
 set expandtab
 
+set number relativenumber
+
 set encoding=utf-8
 
 let mapleader=","

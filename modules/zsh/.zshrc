@@ -76,7 +76,7 @@ function gupdate() {
 
 compdef _kns kns
 
-# Permanently set the Kubernetes namespace
+# Permanently set the Kubernetes namespace.
 function kns() {
   kubectl get namespace "${1}" > /dev/null
   [[ "${?}" -ne 0 ]] && return
@@ -90,7 +90,7 @@ function _kns() {
 
 compdef _kplain kplain
 
-# Pretty print Kubernetes secrets
+# Pretty print Kubernetes secrets.
 function kplain() {
   kubectl get secret "${1}" --output=go-template='{{range $key, $value := .data}}{{printf "%s=%s\n" $key ($value | base64decode)}}{{end}}'
 }
@@ -101,6 +101,17 @@ function _kplain() {
 
 function kpods() {
   kubectl get pods --selector="app.kubernetes.io/name=${1}" "${@:2}"
+}
+
+compdef _kwatch kwatch
+
+# Watch Kubernetes resources.
+function kwatch() {
+  kubectl get "${1}" --watch-only
+}
+
+function _kwatch() {
+  _alternative "1: :($(kubectl api-resources --output=name))"
 }
 
 # Exports
