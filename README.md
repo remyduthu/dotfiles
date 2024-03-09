@@ -29,6 +29,12 @@ This project is splitted into modules. Each module vaguely represents a tool.
   brew bundle cleanup --file="${DOTFILES_PATH}/modules/brew/Brewfile" --force --zap
   ```
 
+- List Brew packages that I've installed by hand:
+
+  ```zsh
+  brew leaves
+  ```
+
 ## Todo
 
 - Lint ZSH scripts
