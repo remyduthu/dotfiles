@@ -3,6 +3,13 @@
 
 # ZSH options: http://zsh.sourceforge.net/Doc/Release/Options.html
 
+# Add Brew completion files. It must be done before `compinit` is called
+# (https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh).
+if type brew &>/dev/null
+then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
+
 # The following `autoload` options are mainly used to avoid conflicts with
 # existing commands and functions (`man zshbuiltins`)
 #
