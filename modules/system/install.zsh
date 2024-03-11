@@ -38,8 +38,6 @@ defaults write "com.apple.finder" "ShowStatusBar" -bool true
 defaults write "Apple Global Domain" "AppleShowAllExtensions" -boolean true
 defaults write "com.apple.AdLib" "allowApplePersonalizedAdvertising" -boolean false
 defaults write "com.apple.Safari" "AutoOpenSafeDownloads" -boolean false
-defaults write "com.apple.Terminal" "SecureKeyboardEntry" -boolean true
-defaults write "com.googlecode.iterm2" "Secure Input" -boolean true
 
 set +x
 
