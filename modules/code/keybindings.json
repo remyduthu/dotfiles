@@ -1,1 +1,6 @@
-[]
+[
+  {
+    "key": "shift+alt+w",
+    "command": "workbench.action.switchWindow"
+  }
+]
