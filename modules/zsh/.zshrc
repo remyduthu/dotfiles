@@ -33,8 +33,21 @@ source "$(brew --prefix)/etc/profile.d/z.sh"
 
 # History
 #
+# https://martinheinz.dev/blog/110
 
-setopt hist_ignore_dups hist_ignore_space hist_reduce_blanks share_history
+HIST_STAMPS="yyyy-mm-dd"
+HISTFILE="${HOME}/.zsh_history"
+setopt append_history        # Append to history file (default)
+setopt extended_history      # Write the history file in the ':start:elapsed;command' format.
+setopt hist_ignore_all_dups  # Delete an old recorded event if a new event is a duplicate.
+setopt hist_ignore_dups      # Do not record an event that was just recorded again.
+setopt hist_ignore_space     # Do not record an event starting with a space.
+setopt hist_no_store         # Don't store history commands
+setopt hist_reduce_blanks    # Remove superfluous blanks from each command line being added to the history.
+setopt hist_save_no_dups     # Do not write a duplicate event to the history file.
+setopt hist_verify           # Do not execute immediately upon history expansion.
+setopt inc_append_history    # Write to the history file immediately, not when the shell exits.
+setopt share_history         # Share history between all sessions.
 
 # Prompt
 #
