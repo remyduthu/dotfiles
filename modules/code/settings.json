@@ -1,10 +1,14 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.cursorSmoothCaretAnimation": "on",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily": "Fira Code",
   "editor.fontLigatures": true,
   "editor.fontSize": 12,
   "editor.formatOnSave": true,
-  "editor.inlineSuggest.enabled": true,
+  "editor.lineNumbers": "relative",
   "editor.minimap.enabled": false,
   "editor.quickSuggestions": {
     "comments": "on",
@@ -17,7 +21,7 @@
   "security.workspace.trust.untrustedFiles": "open",
   "window.commandCenter": false,
   "workbench.activityBar.location": "top",
-  "workbench.colorTheme": "Dracula",
+  "workbench.colorTheme": "Solarized Light+",
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.startupEditor": "none",
@@ -25,29 +29,32 @@
   // Git
   "diffEditor.diffAlgorithm": "advanced",
   "git.openRepositoryInParentFolders": "always",
+  "gitlens.codeLens.enabled": false,
 
   // Go
   "go.coverOnSingleTest": true,
   "go.coverOnSingleTestFile": true,
-  "go.lintFlags": ["--fast"],
+  "go.lintFlags": ["--fast", "--fix"],
   "go.lintTool": "golangci-lint",
-  "go.testFlags": ["-v"],
+  "go.testFlags": ["-coverpkg=all", "-v"],
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
 
-  // NVim
+  // Neovim
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1 // Run extension in its own thread.
   },
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
 
-  // Python
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
-  },
+  // Rewrap
+  "rewrap.autoWrap.enabled": true,
+  "rewrap.wrappingColumn": 120,
 
-  // TS
+  // Terminal
+  "terminal.integrated.cursorBlinking": true,
+
+  // Typescript
   "typescript.preferences.importModuleSpecifier": "non-relative",
 
   // YAML
@@ -73,16 +80,16 @@
 
   // Project Manager
   "projectManager.any.baseFolders": [
-    "~/dev/next/services/",
-    "~/dev/next/projects/"
+    "~/dev/next/packages/",
+    "~/dev/next/projects/",
+    "~/dev/next/services/"
   ],
-  "projectManager.any.maxDepthRecursion": 1,
-  "projectManager.git.baseFolders": ["~/dev/"],
-  "projectManager.hg.ignoredFolders": ["node_modules", "out", "test", "vendor"],
-  "projectManager.vscode.ignoredFolders": [
+  "projectManager.any.ignoredFolders": [
     "node_modules",
     "out",
     "test",
-    "vendor"
-  ]
+    "typings"
+  ],
+  "projectManager.any.maxDepthRecursion": 1,
+  "projectManager.git.baseFolders": ["~/dev/"]
 }
