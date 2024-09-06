@@ -73,17 +73,19 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
 # Replacements
+alias cat='bat'
 alias grep='egrep --color="auto"'
-alias ls="exa"
+alias ls="eza"
 
 # Shortcuts
 alias b="brew"
 alias d="docker"
 alias g="git"
 alias k="kubectl"
-alias ll="ls -l"
 alias la="ls -al"
+alias ll="ls -l"
 alias v="nvim"
+alias zs="source ${HOME}/.zshrc"
 
 # Functions
 #
@@ -164,3 +166,4 @@ export PATH="${PATH}:${HOME}/.krew/bin"
 export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirectories.
 export PATH="${PATH}:$(go env GOPATH)/bin"
 export PATH="${PATH}:${PNPM_HOME}"
+export PATH="${PATH}:${HOME}/.local/bin"
