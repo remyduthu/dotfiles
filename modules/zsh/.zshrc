@@ -167,3 +167,5 @@ export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirec
 export PATH="${PATH}:$(go env GOPATH)/bin"
 export PATH="${PATH}:${PNPM_HOME}"
 export PATH="${PATH}:${HOME}/.local/bin"
+
+export WORDCHARS="*?.[]~=&;!#$%^(){}<>"
