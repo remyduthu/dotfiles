@@ -40,7 +40,7 @@
   "go.coverOnSingleTestFile": true,
   "go.lintFlags": ["--fast", "--fix"],
   "go.lintTool": "golangci-lint",
-  "go.testFlags": ["-coverpkg=all", "-v"],
+  "go.testFlags": ["-v"],
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
