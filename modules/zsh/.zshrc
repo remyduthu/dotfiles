@@ -31,6 +31,10 @@ bindkey '^[[Z' autosuggest-accept
 # https://github.com/rupa/z
 source "$(brew --prefix)/etc/profile.d/z.sh"
 
+# https://github.com/junegunn/fzf?tab=readme-ov-file#setting-up-shell-integration
+source <(fzf --zsh)
+export FZF_COMPLETION_OPTS='--border --height=25% --info=inline'
+
 # History
 #
 # https://martinheinz.dev/blog/110
@@ -48,6 +52,7 @@ setopt hist_save_no_dups     # Do not write a duplicate event to the history fil
 setopt hist_verify           # Do not execute immediately upon history expansion.
 setopt inc_append_history    # Write to the history file immediately, not when the shell exits.
 setopt share_history         # Share history between all sessions.
+
 
 # Prompt
 #
