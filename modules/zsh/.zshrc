@@ -152,6 +152,17 @@ function _kwatch() {
   _alternative "1: :($(kubectl api-resources --output=name))"
 }
 
+# Pretty print Kubernetes JSON logs.
+function kjlogs() {
+  kubectl logs "${@}"|jq -R 'fromjson? | .'
+}
+
+function _kjlogs() {
+  _alternative "1: :($(kubectl get pods --output=go-template='{{range .items}}{{printf "%s\n" .metadata.name}}{{end}}'))"
+}
+
+compdef _kjlogs kjlogs
+
 # Exports
 #
 
@@ -166,11 +177,15 @@ export LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
 
 export PNPM_HOME="${HOME}/Library/pnpm"
 
+export PYENV_ROOT="${HOME}/.pyenv"
+eval "$(pyenv init - zsh)"
+
 export PATH="${PATH}:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-export PATH="${PATH}:${HOME}/.krew/bin"
-export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirectories.
 export PATH="${PATH}:$(go env GOPATH)/bin"
-export PATH="${PATH}:${PNPM_HOME}"
+export PATH="${PATH}:${HOME}/.krew/bin"
 export PATH="${PATH}:${HOME}/.local/bin"
+export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirectories.
+export PATH="${PATH}:${PNPM_HOME}"
+export PATH="${PYENV_ROOT}/bin:${PATH}"
 
 export WORDCHARS="*?.[]~=&;!#$%^(){}<>"

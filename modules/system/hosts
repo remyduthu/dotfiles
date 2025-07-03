@@ -2,15 +2,6 @@
 255.255.255.255 broadcasthost
 ::1 localhost
 
-127.0.0.1 admin.loungeup.com.loungeup.dev
-127.0.0.1 api.loungeup.com.loungeup.dev
-127.0.0.1 id.loungeup.com.loungeup.dev
-127.0.0.1 my.loungeup.com.loungeup.dev
-127.0.0.1 portal.loungeup.com.loungeup.dev
-127.0.0.1 static.loungeup.com.loungeup.dev
-127.0.0.1 structurizr.loungeup.com.loungeup.dev
-127.0.0.1 svc.loungeup.com.loungeup.dev
-
 # Added by Docker Desktop
 # To allow the same kube context to work on the host and the container:
 127.0.0.1 kubernetes.docker.internal

@@ -19,6 +19,7 @@ as_sudo "curl --location https://raw.githubusercontent.com/docker/cli/master/con
 as_sudo "helm completion zsh > ${FPATH}/_helm"
 as_sudo "kubectl completion zsh > ${FPATH}/_kubectl"
 as_sudo "kustomize completion zsh > ${FPATH}/_kustomize"
+as_sudo "poetry completions zsh > ${FPATH}/_poetry"
 
 taskf "Link configuration files"
 touch "${HOME}/.hushlogin" # Remove the login banner

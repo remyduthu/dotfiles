@@ -11,6 +11,3 @@ Host *
   StrictHostKeyChecking ask
   TCPKeepAlive yes
   UseKeychain yes
-
-Host *.loungeup.net
-  IdentityFile ~/.ssh/id_loungeup_ecdsa
