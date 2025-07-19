@@ -9,28 +9,31 @@ source "${DOTFILES_PATH}"/src/*.zsh
 require "code"
 
 taskf "Install extensions"
-for extension in \
-  "alefragnani.project-manager" \
-  "asvetliakov.vscode-neovim" \
-  "bmewburn.vscode-intelephense-client" \
-  "charliermarsh.ruff" \
-  "dbaeumer.vscode-eslint" \
-  "dracula-theme.theme-dracula" \
-  "eamodio.gitlens" \
-  "editorconfig.editorconfig" \
-  "esbenp.prettier-vscode" \
-  "github.copilot" \
-  "github.copilot-chat" \
-  "golang.go" \
-  "ms-python.debugpy" \
-  "ms-python.python" \
-  "ms-python.vscode-pylance" \
-  "ms-vsliveshare.vsliveshare" \
-  "mvllow.rose-pine" \
-  "redhat.vscode-xml" \
-  "redhat.vscode-yaml" \
-  "tamasfe.even-better-toml" \
-  "timonwong.shellcheck"
+# You can list installed extensions with: 'code --list-extensions'.
+extensions=(
+  alefragnani.project-manager
+  asvetliakov.vscode-neovim
+  bmewburn.vscode-intelephense-client
+  charliermarsh.ruff
+  dbaeumer.vscode-eslint
+  dracula-theme.theme-dracula
+  eamodio.gitlens
+  editorconfig.editorconfig
+  esbenp.prettier-vscode
+  github.copilot
+  github.copilot-chat
+  golang.go
+  ms-python.debugpy
+  ms-python.python
+  ms-python.vscode-pylance
+  ms-vsliveshare.vsliveshare
+  mvllow.rose-pine
+  redhat.vscode-xml
+  redhat.vscode-yaml
+  tamasfe.even-better-toml
+  timonwong.shellcheck
+)
+for extension in "${extensions[@]}"
 do
   code --force --install-extension "${extension}" || true # Ignore errors.
 done
