@@ -37,7 +37,7 @@ if [[ -n ${@} ]] {
   install_modules "${@}"
 } else {
   # Without arguments, install all modules.
-  install_modules "brew" "code" "git" "go" "iterm" "krew" "nvim" "rectangle" "ssh" "system" "zsh"
+  install_modules "brew" "code" "git" "go" "iterm" "krew" "nvim" "pipx" "ssh" "system" "zsh"
 }
 
 
