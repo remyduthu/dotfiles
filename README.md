@@ -7,13 +7,12 @@ This project is inspired by [Nyalab](https://github.com/Nyalab/handles), [mathia
 - Execute the [`export.zsh`](./export.zsh) script.
 - [Install a fresh copy of macOS](https://support.apple.com/en-gb/HT212749).
 - Perform the initial configuration until you can use the system.
-- [Install Dashlane](https://www.dashlane.com/download).
 - Download this repository.
 - Execute the [`run.zsh`](./run.zsh) script without arguments to configure the entire system.
 - Follow the ["Hardening macOS"](https://www.bejarano.io/hardening-macos/) guide[^*].
 - Configure native applications (Mail, Safari, etc.)[^*].
 
-[^*]: Some parameters are already set but others cannot be configured dynamically.
+[^*]: Some parameters are already set but others cannot be set programmatically.
 
 ## Modules
 
@@ -29,10 +28,10 @@ This project is splitted into modules. Each module vaguely represents a tool.
   brew bundle cleanup --file="${DOTFILES_PATH}/modules/brew/Brewfile" --force --zap
   ```
 
-- List Brew packages that I've installed by hand:
+- List Brew formulae that I've installed by hand:
 
   ```zsh
-  brew leaves
+  brew list --formulae --full-name --installed-on-request
   ```
 
 ## Todo
