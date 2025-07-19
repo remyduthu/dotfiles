@@ -37,4 +37,3 @@ This project is splitted into modules. Each module vaguely represents a tool.
 ## Todo
 
 - Lint ZSH scripts
-- Download Git repositories
