@@ -13,3 +13,8 @@ Host *
   StrictHostKeyChecking ask
   TCPKeepAlive yes
   UseKeychain yes
+
+Host github.com
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+  UseKeychain yes
