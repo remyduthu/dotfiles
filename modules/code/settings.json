@@ -8,14 +8,13 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
   "editor.formatOnSave": true,
-  "editor.lineNumbers": "relative",
   "editor.quickSuggestions": {
     "comments": true,
     "other": true,
     "strings": true
   },
   "editor.quickSuggestionsDelay": 0,
-  "editor.rulers": [120],
+  "editor.rulers": [80, 120],
   "editor.suggest.localityBonus": true,
 
   // https://dev.to/andrewgeorge/minimal-vscode-ui-343e
@@ -34,7 +33,6 @@
   "editor.guides.indentation": false,
   "editor.cursorBlinking": "phase",
   "editor.renderLineHighlight": "none",
-  "editor.glyphMargin": false,
   "workbench.layoutControl.type": "menu",
 
   "gitlens.currentLine.enabled": false,

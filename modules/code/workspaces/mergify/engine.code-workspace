@@ -4,6 +4,28 @@
       "path": "/Users/remyduthu/dev/mergify/engine/"
     }
   ],
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run Tests",
+        "request": "launch",
+        "type": "debugpy",
+        "preLaunchTask": "Start Docker Containers",
+        "postDebugTask": "Stop Docker Containers",
+        "cwd": "${workspaceFolder}",
+        "envFile": "${workspaceFolder}/test.env",
+        "args": ["-k", "${input:expression}"]
+      }
+    ],
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "expression",
+        "description": "Enter the expression to filter tests (e.g., 'test_name')"
+      }
+    ]
+  },
   "settings": {
     // Format.
     "[python]": {
@@ -12,7 +34,14 @@
 
     // Lint.
     "ruff.fixAll": true,
-    "ruff.lint.enable": true
+    "ruff.lint.enable": true,
+
+    // Tests.
+    "python.envFile": "${workspaceFolder}/test.env",
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["mergify_engine/tests"]
   },
   "tasks": {
     "version": "2.0.0",
@@ -23,6 +52,9 @@
         "command": "poe setup && ./tools/run-tests.sh trap echo EXIT",
         "presentation": {
           "reveal": "silent"
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
         }
       },
       {
@@ -40,6 +72,7 @@
           "kind": "test",
           "isDefault": true
         },
+        "problemMatcher": ["$python"],
         "command": "poe",
         "args": ["test-parallel"]
       }
