@@ -29,6 +29,9 @@
 [merge]
   conflictstyle = diff3
 
+[mergify-cli]
+  stack-branch-prefix = devs/remyduthu
+
 [pull]
   rebase = true
 
