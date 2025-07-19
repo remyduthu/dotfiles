@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "path": "/Users/remyduthu/dev/mergify/engine/"
+    }
+  ],
+  "settings": {
+    // Format.
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+
+    // Linters.
+    "ruff.fixAll": true,
+    "ruff.lint.enable": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Docker Containers",
+        "type": "shell",
+        "command": "poe setup && ./tools/run-tests.sh trap echo EXIT",
+        "presentation": {
+          "reveal": "silent"
+        }
+      },
+      {
+        "label": "Stop Docker Containers",
+        "type": "shell",
+        "command": "docker-compose down --remove-orphans --volumes",
+        "presentation": {
+          "reveal": "silent"
+        }
+      }
+    ]
+  }
+}
