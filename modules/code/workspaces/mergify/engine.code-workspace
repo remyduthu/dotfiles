@@ -10,7 +10,7 @@
       "editor.defaultFormatter": "charliermarsh.ruff"
     },
 
-    // Linters.
+    // Lint.
     "ruff.fixAll": true,
     "ruff.lint.enable": true
   },
