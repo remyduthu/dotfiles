@@ -3,6 +3,8 @@
 
 # ZSH options: http://zsh.sourceforge.net/Doc/Release/Options.html
 
+export DOTFILES_PATH="/Users/remyduthu/dev/dotfiles/"
+
 # Add Brew completion files. It must be done before `compinit` is called
 # (https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh).
 if type brew &>/dev/null
@@ -104,6 +106,18 @@ function _bprune() {
 }
 
 compdef _bprune bprune
+
+CODE_WORKSPACES_PATH="${DOTFILES_PATH}/modules/code/workspaces/"
+
+function cwork() {
+  code "${CODE_WORKSPACES_PATH}/${1}.code-workspace"
+}
+
+function _cwork() {
+  _alternative "1: :($(find "${CODE_WORKSPACES_PATH}/" -name '*.code-workspace' -type f | sed "s|${CODE_WORKSPACES_PATH}/||; s/\.code-workspace$//"))"
+}
+
+compdef _cwork cwork
 
 function gupdate() {
   DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
