@@ -108,17 +108,5 @@
   },
 
   // Project Manager
-  "projectManager.any.baseFolders": [
-    "~/dev/next/packages/",
-    "~/dev/next/projects/",
-    "~/dev/next/services/"
-  ],
-  "projectManager.any.ignoredFolders": [
-    "node_modules",
-    "out",
-    "test",
-    "typings"
-  ],
-  "projectManager.any.maxDepthRecursion": 1,
-  "projectManager.git.baseFolders": ["~/dev/"]
+  "projectManager.git.baseFolders": ["~/dev/", "~/dev/merfigy/"]
 }
