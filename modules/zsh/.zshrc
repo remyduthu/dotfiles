@@ -175,17 +175,28 @@ export HOMEBREW_NO_INSECURE_REDIRECT="1"
 
 export LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
 
+# https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating
+export NVM_DIR="${HOME}/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # Load nvm.
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # Load nvm completion.
+
 export PNPM_HOME="${HOME}/Library/pnpm"
 
 export PYENV_ROOT="${HOME}/.pyenv"
 eval "$(pyenv init - zsh)"
 
 export PATH="${PATH}:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+export PATH="${PATH}:/opt/homebrew/bin"
+export PATH="${PATH}:/opt/homebrew/sbin"
 export PATH="${PATH}:$(go env GOPATH)/bin"
 export PATH="${PATH}:${HOME}/.krew/bin"
 export PATH="${PATH}:${HOME}/.local/bin"
-export PATH="${PATH}:${HOME}/dev/next/scripts" # TODO(remyduthu): Match subdirectories.
 export PATH="${PATH}:${PNPM_HOME}"
 export PATH="${PYENV_ROOT}/bin:${PATH}"
+
+# Use GNU binaries installed by Homebrew instead of those provided by macOS.
+for gnubin in gnu-sed grep findutils coreutils; do
+    export PATH="${PATH}:/opt/homebrew/opt/${gnubin}/libexec/gnubin"
+done
 
 export WORDCHARS="*?.[]~=&;!#$%^(){}<>"
