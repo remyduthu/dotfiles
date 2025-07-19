@@ -19,6 +19,7 @@ extensions=(
   dracula-theme.theme-dracula
   eamodio.gitlens
   editorconfig.editorconfig
+  emeraldwalk.runonsave
   esbenp.prettier-vscode
   github.copilot
   github.copilot-chat
