@@ -68,10 +68,6 @@ For security, I referenced the ["Hardening macOS"](https://www.bejarano.io/harde
 
 </details>
 
-## Todo
-
-- [ ] Lint ZSH scripts
-
 ---
 
 Feel free to fork and adapt these dotfiles to your own workflow!
