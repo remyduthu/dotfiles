@@ -3,15 +3,18 @@
 This repository contains my personal dotfiles and setup scripts for macOS.
 It is inspired by the dotfiles of [Nyalab](https://github.com/Nyalab/handles), [mathiasbynens](https://github.com/mathiasbynens/dotfiles/), and [paulirish](https://github.com/paulirish/dotfiles).
 
-## Setup Procedure
+## Procedure
 
 1. **Export your current configuration**
+
    Run [`export.zsh`](./export.zsh) to back up your system configuration (SSH keys, etc.).
 
 2. **Install macOS**
+
    [Reinstall macOS](https://support.apple.com/en-gb/HT212749) if needed.
 
 3. **Initial macOS configuration**
+
    Complete the basic setup until you can access the system.
 
 4. **Clone this repository**
@@ -22,10 +25,12 @@ cd dotfiles
 ```
 
 5. **Run the setup script**
+
    Execute [`run.zsh`](./run.zsh) with no arguments.
    This will install Homebrew and configure your system automatically.
 
 6. **Apply manual macOS preferences**
+
    Follow the [macOS configuration](#macos-configuration) steps below to fine-tune your system.
 
 ## macOS Configuration
