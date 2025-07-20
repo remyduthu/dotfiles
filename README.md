@@ -5,37 +5,16 @@ It is inspired by the dotfiles of [Nyalab](https://github.com/Nyalab/handles), [
 
 ## Procedure
 
-1. **Export your current configuration**
-
-   Run [`export.zsh`](./export.zsh) to back up your system configuration (SSH keys, etc.).
-
-2. **Install macOS**
-
-   [Reinstall macOS](https://support.apple.com/en-gb/HT212749) if needed.
-
-3. **Initial macOS configuration**
-
-   Complete the basic setup until you can access the system.
-
-4. **Clone this repository**
-
-```sh
-git clone https://github.com/remyduthu/dotfiles.git
-cd dotfiles
-```
-
-5. **Run the setup script**
-
-   Execute [`run.zsh`](./run.zsh) with no arguments.
-   This will install Homebrew and configure your system automatically.
-
-6. **Apply manual macOS preferences**
-
-   Follow the [macOS configuration](#macos-configuration) steps below to fine-tune your system.
+1. Run [`export.zsh`](./export.zsh) to back up your system configuration (SSH keys, etc.).
+2. [Install a fresh copy of macOS](https://support.apple.com/en-gb/HT212749).
+3. Perform the initial configuration until you can use the system.
+4. Clone this repository
+5. Execute [`run.zsh`](./run.zsh) with no arguments. This will install Homebrew and configure your system automatically.
+6. Follow the [macOS configuration](#macos-configuration) steps below to fine-tune your system.
 
 ## macOS Configuration
 
-Below are my recommended macOS settings.
+These are my recommended macOS settings.
 Adjust them as needed.
 Some are automated by the [system module](./modules/system/install.zsh).
 For security, I referenced the ["Hardening macOS"](https://www.bejarano.io/hardening-macos/) guide.
