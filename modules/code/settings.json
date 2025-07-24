@@ -59,6 +59,7 @@
     "markdown": true,
     "plaintext": true
   },
+  "github.copilot.nextEditSuggestions.enabled": true,
 
   // Go
   "go.coverOnSingleTest": true,
