@@ -27,16 +27,19 @@
     ]
   },
   "settings": {
-    "python.analysis.autoImportCompletions": true,
-
     // Format.
     "[python]": {
       "editor.defaultFormatter": "charliermarsh.ruff"
     },
 
     // Lint.
-    "ruff.fixAll": true,
     "ruff.lint.enable": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "strict",
 
     // Tests.
     "python.envFile": "${workspaceFolder}/test.env",
