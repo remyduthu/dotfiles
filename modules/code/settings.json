@@ -35,15 +35,13 @@
   "editor.renderLineHighlight": "none",
   "workbench.layoutControl.type": "menu",
 
-  "gitlens.currentLine.enabled": false,
-
   "explorer.confirmDragAndDrop": false,
   "extensions.ignoreRecommendations": true,
   "security.workspace.trust.untrustedFiles": "open",
   "window.commandCenter": false,
   "window.confirmBeforeClose": "keyboardOnly",
 
-  "workbench.colorTheme": "Rosé Pine Dawn",
+  "workbench.colorTheme": "Dracula Theme",
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.startupEditor": "none",
@@ -76,6 +74,18 @@
   },
 
   // Python
+  "python.languageServer": "Pylance",
+  "python.analysis.languageServerMode": "full",
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.inlayHints.callArgumentNames": "all",
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.fixAll": [
+    "source.convertImportFormat",
+    "source.unusedImports"
+  ],
+  "python.analysis.autoFormatStrings": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
@@ -109,8 +119,5 @@
   // XML
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml"
-  },
-
-  // Project Manager
-  "projectManager.git.baseFolders": ["~/dev/", "~/dev/merfigy/"]
+  }
 }
