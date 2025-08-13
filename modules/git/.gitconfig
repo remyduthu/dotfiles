@@ -6,6 +6,11 @@
   l = log --abbrev-commit --color --date=relative --graph
   please = push --force-with-lease
   s = status --short
+  set-default-upstream = "!f() { \
+    branch=$(git symbolic-ref --short HEAD); \
+    default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD); \
+    git branch \"${branch}\" --set-upstream-to=\"${default_branch}\"; \
+  }; f"
   sw = switch
 
 [apply]
