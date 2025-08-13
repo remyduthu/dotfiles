@@ -19,7 +19,6 @@
 
   // https://dev.to/andrewgeorge/minimal-vscode-ui-343e
   "workbench.activityBar.location": "hidden",
-  "workbench.sideBar.location": "right",
   "workbench.statusBar.visible": false,
   "editor.minimap.enabled": false,
   "editor.hideCursorInOverviewRuler": true,
@@ -45,6 +44,7 @@
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.startupEditor": "none",
+  "outline.collapseItems": "alwaysCollapse",
 
   // Git
   "diffEditor.diffAlgorithm": "advanced",
@@ -52,6 +52,7 @@
   "gitlens.codeLens.enabled": false,
 
   // GitHub Copilot
+  "chat.agent.maxRequests": 1000,
   "github.copilot.enable": {
     "*": true,
     "markdown": true,

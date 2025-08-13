@@ -38,6 +38,9 @@
       "source.fixAll.ruff": "explicit",
       "source.organizeImports.ruff": "explicit"
     },
+    "python.analysis.diagnosticSeverityOverrides": {
+      "reportUnknownArgumentType": "none"
+    },
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "strict",
 
