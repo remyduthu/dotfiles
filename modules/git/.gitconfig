@@ -2,7 +2,9 @@
   amend = commit --amend --no-edit
   b = branch
   c = commit
-  fix = "!git commit --fixup=${1} #"
+  fix = "!f() { \
+    git commit --fixup=\"${1:-HEAD}\"; \
+  }; f"
   l = log --abbrev-commit --color --date=relative --graph
   please = push --force-with-lease
   s = status --short
