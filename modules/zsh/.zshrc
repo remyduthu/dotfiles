@@ -110,7 +110,20 @@ compdef _bprune bprune
 CODE_WORKSPACES_PATH="${DOTFILES_PATH}/modules/code/workspaces/"
 
 function cwork() {
-  code "${CODE_WORKSPACES_PATH}/${1}.code-workspace"
+  if [[ "${1}" != "." ]]; then
+    code "${CODE_WORKSPACES_PATH}/${1}.code-workspace"
+    return
+  fi
+
+  local current_directory="${PWD}"
+  local dev_directory="${HOME}/dev/"
+
+  if [[ "${current_directory}" != "${dev_directory}"* ]]; then
+    echo "'.' can only be used inside the '${dev_directory}' directory."
+    return 1
+  fi
+
+  code "${CODE_WORKSPACES_PATH}/${current_directory#"${dev_directory}"}.code-workspace"
 }
 
 function _cwork() {
