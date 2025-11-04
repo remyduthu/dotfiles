@@ -1,31 +1,8 @@
 {
   "folders": [
-    {
-      "path": "/Users/remyduthu/dev/mergify/engine/"
-    }
+    { "path": "/Users/remyduthu/dev/mergify/engine/" },
+    { "path": "/Users/remyduthu/dev/mergify/engine-draft/" }
   ],
-  "launch": {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Run Tests",
-        "request": "launch",
-        "type": "debugpy",
-        "preLaunchTask": "Start Docker Containers",
-        "postDebugTask": "Stop Docker Containers",
-        "cwd": "${workspaceFolder}",
-        "envFile": "${workspaceFolder}/test.env",
-        "args": ["-k", "${input:expression}"]
-      }
-    ],
-    "inputs": [
-      {
-        "type": "promptString",
-        "id": "expression",
-        "description": "Enter the expression to filter tests (e.g., 'test_name')"
-      }
-    ]
-  },
   "settings": {
     // Format.
     "[python]": {
@@ -38,11 +15,9 @@
       "source.fixAll.ruff": "explicit",
       "source.organizeImports.ruff": "explicit"
     },
-    "python.analysis.diagnosticSeverityOverrides": {
-      "reportUnknownArgumentType": "none"
-    },
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.typeCheckingMode": "off", // Use Mypy instead.
+    "mypy-type-checker.importStrategy": "fromEnvironment",
 
     // Tests.
     "python.envFile": "${workspaceFolder}/test.env",
@@ -64,9 +39,6 @@
         "command": "poe setup && ./tools/run-tests.sh trap echo EXIT",
         "presentation": {
           "reveal": "silent"
-        },
-        "runOptions": {
-          "runOn": "folderOpen"
         }
       },
       {
@@ -76,17 +48,6 @@
         "presentation": {
           "reveal": "silent"
         }
-      },
-      {
-        "label": "Run Tests",
-        "type": "shell",
-        "group": {
-          "kind": "test",
-          "isDefault": true
-        },
-        "problemMatcher": ["$python"],
-        "command": "poe",
-        "args": ["test-parallel"]
       }
     ]
   }
