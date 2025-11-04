@@ -1,123 +1,44 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "editor.cursorSmoothCaretAnimation": "on",
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "chat.agent.maxRequests": 1000,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.organizeImports": "always"
+  },
+  "editor.cursorBlinking": "phase",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily": "Fira Code",
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
   "editor.formatOnSave": true,
-  "editor.quickSuggestions": {
-    "comments": true,
-    "other": true,
-    "strings": true
-  },
-  "editor.quickSuggestionsDelay": 0,
-  "editor.rulers": [80, 120],
-  "editor.suggest.localityBonus": true,
-
-  // https://dev.to/andrewgeorge/minimal-vscode-ui-343e
-  "workbench.activityBar.location": "hidden",
-  "workbench.statusBar.visible": false,
-  "editor.minimap.enabled": false,
-  "editor.hideCursorInOverviewRuler": true,
-  "editor.overviewRulerBorder": false,
-  "breadcrumbs.enabled": false,
-  "workbench.tree.renderIndentGuides": "none",
-  "explorer.decorations.colors": false,
-  "editor.bracketPairColorization.enabled": false,
-  "editor.guides.highlightActiveBracketPair": false,
-  "editor.guides.bracketPairsHorizontal": false,
-  "editor.guides.indentation": false,
-  "editor.cursorBlinking": "phase",
-  "editor.renderLineHighlight": "none",
-  "workbench.layoutControl.type": "menu",
-
-  "explorer.confirmDragAndDrop": false,
-  "extensions.ignoreRecommendations": true,
-  "security.workspace.trust.untrustedFiles": "open",
-  "window.commandCenter": false,
-  "window.confirmBeforeClose": "keyboardOnly",
-
-  "workbench.colorTheme": "Dracula Theme",
-  "workbench.iconTheme": "vs-minimal",
-  "workbench.layoutControl.enabled": false,
-  "workbench.startupEditor": "none",
-  "outline.collapseItems": "alwaysCollapse",
-
-  // Git
-  "diffEditor.diffAlgorithm": "advanced",
-  "git.openRepositoryInParentFolders": "always",
-  "gitlens.codeLens.enabled": false,
-
-  // GitHub Copilot
-  "chat.agent.maxRequests": 1000,
-  "github.copilot.enable": {
-    "*": true,
-    "markdown": true,
-    "plaintext": true
-  },
-
-  // Go
-  "go.coverOnSingleTest": true,
-  "go.coverOnSingleTestFile": true,
-  "go.lintTool": "golangci-lint-v2",
-  "go.testFlags": ["-v"],
-  "[go]": {
-    "editor.defaultFormatter": "golang.go"
-  },
-
-  // Neovim
-  "extensions.experimental.affinity": {
-    "asvetliakov.vscode-neovim": 1 // Run extension in its own thread.
-  },
-
-  // Python
-  "python.languageServer": "Pylance",
-  "python.analysis.languageServerMode": "full",
-  "python.analysis.typeCheckingMode": "strict",
-  "python.analysis.inlayHints.callArgumentNames": "all",
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.pytestParameters": true,
-  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.autoImportCompletions": true,
   "python.analysis.fixAll": [
     "source.convertImportFormat",
     "source.unusedImports"
   ],
-  "python.analysis.autoFormatStrings": true,
-  "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff"
-  },
-
-  // Rewrap
-  "rewrap.autoWrap.enabled": true,
-  "rewrap.wrappingColumn": 120,
-
-  // Terminal
-  "terminal.integrated.cursorBlinking": true,
-
-  // Typescript
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-
-  // YAML
-  "redhat.telemetry.enabled": false,
+  "python.analysis.languageServerMode": "full",
+  "python.analysis.typeCheckingMode": "strict",
+  "python.languageServer": "Pylance",
+  "rewrap.wrappingColumn": 80,
+  "workbench.colorTheme": "Rosé Pine",
+  "workbench.iconTheme": "vs-minimal",
   "yaml.schemas": {
     "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": [
       ".gitlab-ci.yml",
       ".gitlab-ci.yaml"
     ],
-    "https://json.schemastore.org/kustomization": "kustomization.yaml",
     "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
       "docker-compose.yml",
       "docker-compose.yaml"
-    ],
-    "https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/schema-v1alpha1.yaml": "sealedsecret.yaml",
-    "kubernetes": ["deploy/**", "!kustomization.yaml", "!sealedsecret.yaml"]
-  },
-
-  // XML
-  "[xml]": {
-    "editor.defaultFormatter": "redhat.vscode-xml"
+    ]
   }
 }
