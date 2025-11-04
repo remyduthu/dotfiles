@@ -19,6 +19,9 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
   "editor.formatOnSave": true,
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
   "extensions.ignoreRecommendations": true,
   "python.analysis.autoFormatStrings": true,
   "python.analysis.autoImportCompletions": true,
