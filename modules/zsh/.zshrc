@@ -214,12 +214,21 @@ eval "$(pyenv init - zsh)"
 
 export PATH="${PATH}:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 export PATH="${PATH}:/opt/homebrew/bin"
+export PATH="${PATH}:/opt/homebrew/opt/libpq/bin"
 export PATH="${PATH}:/opt/homebrew/sbin"
 export PATH="${PATH}:$(go env GOPATH)/bin"
 export PATH="${PATH}:${HOME}/.krew/bin"
 export PATH="${PATH}:${HOME}/.local/bin"
 export PATH="${PATH}:${PNPM_HOME}"
-export PATH="${PYENV_ROOT}/bin:${PATH}"
+export PATH="${PATH}:${PYENV_ROOT}/bin"
+
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+  export PATH="/opt/homebrew/opt/ruby/bin:${PATH}"
+  export PATH=`gem environment gemdir`/bin:${PATH}
+fi
+
+# Include Google Cloud SDK.
+source "/opt/homebrew/share/google-cloud-sdk/path.zsh.inc"
 
 # Use GNU binaries installed by Homebrew instead of those provided by macOS.
 for gnubin in gnu-sed grep findutils coreutils; do
