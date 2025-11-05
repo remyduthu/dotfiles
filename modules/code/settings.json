@@ -31,6 +31,7 @@
     "asvetliakov.vscode-neovim": 1
   },
   "extensions.ignoreRecommendations": true,
+  "git.openRepositoryInParentFolders": "always",
   "python.analysis.autoFormatStrings": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.fixAll": [
