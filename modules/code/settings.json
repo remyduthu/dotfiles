@@ -23,7 +23,9 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
   "editor.formatOnSave": true,
+  "editor.guides.indentation": false,
   "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "trailing",
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
@@ -44,6 +46,7 @@
   "workbench.iconTheme": "vs-minimal",
   "workbench.layoutControl.enabled": false,
   "workbench.statusBar.visible": false,
+  "workbench.tree.renderIndentGuides": "none",
   "yaml.schemas": {
     "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": [
       ".gitlab-ci.yml",
