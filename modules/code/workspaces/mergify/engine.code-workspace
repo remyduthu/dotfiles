@@ -1,7 +1,14 @@
 {
   "folders": [
-    { "path": "/Users/remyduthu/dev/mergify/engine/" },
-    { "path": "/Users/remyduthu/dev/mergify/engine-draft/" }
+    {
+      "path": "/Users/remyduthu/dev/mergify/engine/"
+    },
+    {
+      "path": "/Users/remyduthu/dev/mergify/engine-draft/"
+    },
+    {
+      "path": "../../../../../mergify/pytest-mergify"
+    }
   ],
   "settings": {
     // Format.
