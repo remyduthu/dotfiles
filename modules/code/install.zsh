@@ -12,10 +12,14 @@ taskf "Install extensions"
 # You can list installed extensions with: 'code --list-extensions'.
 extensions=(
   alefragnani.project-manager
+  astro-build.astro-vscode
   asvetliakov.vscode-neovim
+  biomejs.biome
   bmewburn.vscode-intelephense-client
+  bradlc.vscode-tailwindcss
   charliermarsh.ruff
   dbaeumer.vscode-eslint
+  dnut.rewrap-revived
   dracula-theme.theme-dracula
   eamodio.gitlens
   editorconfig.editorconfig
@@ -23,17 +27,21 @@ extensions=(
   esbenp.prettier-vscode
   github.copilot
   github.copilot-chat
+  github.vscode-pull-request-github
   golang.go
+  johnnymorganz.stylua
   ms-python.debugpy
   ms-python.mypy-type-checker
   ms-python.python
   ms-python.vscode-pylance
+  ms-python.vscode-python-envs
   ms-vsliveshare.vsliveshare
   mvllow.rose-pine
   redhat.vscode-xml
   redhat.vscode-yaml
   tamasfe.even-better-toml
   timonwong.shellcheck
+  unifiedjs.vscode-mdx
 )
 for extension in "${extensions[@]}"
 do
