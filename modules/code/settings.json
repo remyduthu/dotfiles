@@ -12,6 +12,7 @@
     "editor.defaultFormatter": "redhat.vscode-xml"
   },
   "chat.agent.maxRequests": 1000,
+  "chat.commandCenter.enabled": false,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.organizeImports": "always"
@@ -22,6 +23,7 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
   "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
@@ -36,8 +38,12 @@
   "python.analysis.typeCheckingMode": "strict",
   "python.languageServer": "Pylance",
   "rewrap.wrappingColumn": 80,
+  "window.commandCenter": false,
+  "workbench.activityBar.location": "hidden",
   "workbench.colorTheme": "Rosé Pine",
   "workbench.iconTheme": "vs-minimal",
+  "workbench.layoutControl.enabled": false,
+  "workbench.statusBar.visible": false,
   "yaml.schemas": {
     "https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json": [
       ".gitlab-ci.yml",
