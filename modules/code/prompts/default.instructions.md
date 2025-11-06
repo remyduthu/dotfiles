@@ -16,6 +16,7 @@ applyTo: "**"
 - Follow good architecture and design practices.
 - Follow good security practices.
 - Use type hints in any language which supports them.
+- Do not execute tests. I'll execute them to validate the changes afterwards.
 
 ## Comments And Documentation
 
