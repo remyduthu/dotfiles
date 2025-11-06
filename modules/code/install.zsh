@@ -57,6 +57,7 @@ done
 
 taskf "Link configuration files"
 link "${DOTFILES_PATH}/modules/code/keybindings.json" "${HOME}/Library/Application Support/Code/User/keybindings.json"
+link "${DOTFILES_PATH}/modules/code/prompts/default.instructions.md" "${HOME}/Library/Application Support/Code/User/prompts/default.instructions.md"
 link "${DOTFILES_PATH}/modules/code/settings.json" "${HOME}/Library/Application Support/Code/User/settings.json"
 link "${DOTFILES_PATH}/modules/code/snippets.code-snippets" "${HOME}/Library/Application Support/Code/User/snippets/snippets.code-snippets"
 
