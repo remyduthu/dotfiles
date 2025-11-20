@@ -38,6 +38,7 @@
 
 [mergify-cli]
   stack-branch-prefix = devs/remyduthu
+  stack-create-as-draft = true
 
 [pull]
   rebase = true
