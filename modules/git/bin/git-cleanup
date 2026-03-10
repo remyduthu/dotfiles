@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Delete local branches already merged into the default branch.
+# Handles squash merges by checking if a branch has unmerged commits via `git cherry`.
+
+set -euo pipefail
+
+dry_run=false
+if [ "${1:-}" = "--dry-run" ]; then
+    dry_run=true
+fi
+
+# Use the remote tracking branch to include recently merged commits.
+default_branch="origin/$(git symbolic-ref refs/remotes/origin/HEAD | sed "s@refs/remotes/origin/@@")"
+
+# List all local branches, excluding the current branch and main/master.
+candidate_branches=$(
+    git branch \
+        | grep --invert-match --extended-regexp "^\*|^\s*(main|master)$"
+) || true
+
+if [ -z "${candidate_branches}" ]; then
+    echo "No branches to clean up."
+    exit 0
+fi
+
+# Check if a branch has unmerged commits compared to the default branch.
+# `git cherry` outputs "+" for unmerged and "-" for already merged commits.
+is_merged() {
+    local unmerged_commits
+    unmerged_commits=$(git cherry "${default_branch}" "${1}" 2>/dev/null | grep --count "^+") || true
+    [ "${unmerged_commits}" -eq 0 ]
+}
+
+# Delete or report a single merged branch.
+cleanup_branch() {
+    local branch_name="${1}"
+
+    if ! is_merged "${branch_name}"; then
+        return
+    fi
+
+    if [ "${dry_run}" = true ]; then
+        echo "branch '${branch_name}' will be deleted"
+        return
+    fi
+
+    git branch --delete --force "${branch_name}" || true
+}
+
+echo "${candidate_branches}" | while read -r branch_name; do
+    cleanup_branch "${branch_name}"
+done

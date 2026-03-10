@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Scaffold worktrees for the current repository.
+# If worktrees or branches already exist, reset each worktree to its dedicated branch.
+
+set -euo pipefail
+
+repository_root=$(git rev-parse --show-toplevel)
+repository_name=$(basename "${repository_root}")
+worktrees_directory="${repository_root}/.worktrees"
+default_branch="origin/$(git symbolic-ref refs/remotes/origin/HEAD | sed "s@refs/remotes/origin/@@")"
+
+mkdir -p "${worktrees_directory}"
+
+setup_worktree() {
+    local worktree_name="${repository_name}-${1}"
+    local worktree_path="${worktrees_directory}/${worktree_name}"
+
+    # Create the branch if it doesn't exist.
+    if ! git show-ref --verify --quiet "refs/heads/${worktree_name}"; then
+        git branch "${worktree_name}" "${default_branch}"
+    fi
+
+    # Create the worktree if it doesn't exist.
+    if [ ! -d "${worktree_path}" ]; then
+        git worktree add "${worktree_path}" "${worktree_name}"
+        return
+    fi
+
+    # Switch the worktree back to its dedicated branch.
+    git --work-tree="${worktree_path}" --git-dir="${worktree_path}/.git" checkout "${worktree_name}"
+}
+
+setup_worktree 1
+setup_worktree 2
