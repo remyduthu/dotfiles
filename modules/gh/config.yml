@@ -19,45 +19,7 @@ pager:
 # Aliases allow you to create nicknames for gh commands
 aliases:
     co: pr checkout
-    reviews: |
-        !
-          # Fetch the authenticated user's login for filtering reviews.
-          LOGIN=$(gh api user --jq .login)
-
-          # Fetch open PRs requesting the user's review, excluding drafts.
-          # Filter out PRs the user already approved via the reviews subquery.
-          gh api graphql --field query="
-            query {
-              search(query: \"is:open is:pr review-requested:@me draft:false\", type: ISSUE, first: 50) {
-                nodes {
-                  ... on PullRequest {
-                    repository { nameWithOwner }
-                    title
-                    url
-                    reviews(author: \"$LOGIN\", last: 1, states: [APPROVED]) {
-                      totalCount
-                    }
-                  }
-                }
-              }
-            }
-          " | jq --raw-output '
-            .data.search.nodes
-            | map(select(.reviews.totalCount == 0))
-            | group_by(.repository.nameWithOwner)
-            | .[]
-            | (.[0].repository.nameWithOwner) as $repo
-            | "\($repo)",
-              (.[] | [.url, .title] | @tsv)
-          ' | while IFS=$'\t' read -r url title; do
-            # Lines without a tab are repo headers.
-            if [ -z "$title" ]; then
-              echo "$url"
-            else
-              # OSC 8 hyperlink: make the title clickable in supported terminals.
-              printf '  \033]8;;%s\033\\%s\033]8;;\033\\\n' "$url" "$title"
-            fi
-          done
+    reviews: '!gh-reviews'
 
 # The path to a unix socket through which to send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
 http_unix_socket:

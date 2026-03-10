@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# List open pull requests requesting the authenticated user's review.
+# Excludes drafts and already-approved PRs. Groups results by repository.
+
+set -euo pipefail
+
+
+# Fetch open PRs requesting the user's review, excluding drafts.
+# The reviews subquery is used to filter out PRs the user already approved.
+graphql_query="
+  query {
+    search(query: \"is:open is:pr review-requested:@me draft:false\", type: ISSUE, first: 50) {
+      nodes {
+        ... on PullRequest {
+          repository { nameWithOwner }
+          title
+          url
+          reviews(author: \"$(gh api user --jq .login)\", last: 1, states: [APPROVED]) {
+            totalCount
+          }
+        }
+      }
+    }
+  }
+"
+
+# Filter out already-approved PRs, group by repository, and output as tab-separated values.
+# Dollar signs are jq variables, not shell expansions.
+# shellcheck disable=SC2016
+jq_filter='
+  .data.search.nodes
+  | map(select(.reviews.totalCount == 0))
+  | group_by(.repository.nameWithOwner)
+  | .[]
+  | (.[0].repository.nameWithOwner) as $repository
+  | "\($repository)",
+    (.[] | [.url, .title] | @tsv)
+'
+
+gh api graphql --field query="${graphql_query}" \
+  | jq --raw-output "${jq_filter}" \
+  | while IFS=$'\t' read -r url title; do
+      if [ -z "${title}" ]; then
+        # Lines without a tab are repository headers.
+        echo "${url}"
+      else
+        # OSC 8 hyperlink: make the title clickable in supported terminals.
+        printf '  \033]8;;%s\033\\%s\033]8;;\033\\\n' "${url}" "${title}"
+      fi
+    done
