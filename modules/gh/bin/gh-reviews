@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
 # List open pull requests requesting the authenticated user's review.
-# Excludes drafts and already-approved PRs. Groups results by repository.
+# Excludes drafts and already-approved PRs. Groups by repository, detects Mergify stacks.
 
 set -euo pipefail
 
-
-# Fetch open PRs requesting the user's review, excluding drafts.
-# The reviews subquery is used to filter out PRs the user already approved.
 graphql_query="
   query {
     search(query: \"is:open is:pr review-requested:@me draft:false\", type: ISSUE, first: 50) {
       nodes {
         ... on PullRequest {
-          repository { nameWithOwner }
+          number
           title
           url
+          baseRefName
+          headRefName
+          author { login }
+          repository { nameWithOwner }
           reviews(author: \"$(gh api user --jq .login)\", last: 1, states: [APPROVED]) {
             totalCount
           }
@@ -25,27 +26,57 @@ graphql_query="
   }
 "
 
-# Filter out already-approved PRs, group by repository, and output as tab-separated values.
-# Dollar signs are jq variables, not shell expansions.
+# Build Mergify stack chains and format output as tab-separated lines.
+# Stacks are detected by matching each PR's base branch to another PR's head branch.
+# Lines without a tab character are repository headers.
 # shellcheck disable=SC2016
 jq_filter='
-  .data.search.nodes
-  | map(select(.reviews.totalCount == 0))
+  # Follow the Mergify stack chain from a root PR.
+  def follow_chain($pulls):
+    . as $current
+    | [$pulls[] | select(.baseRefName == $current.headRefName)]
+    | if length > 0 then .[0], (.[0] | follow_chain($pulls))
+      else empty end;
+
+  [.data.search.nodes[] | select(.reviews.totalCount == 0)]
   | group_by(.repository.nameWithOwner)
   | .[]
-  | (.[0].repository.nameWithOwner) as $repository
-  | "\($repository)",
-    (.[] | [.url, .title] | @tsv)
+  | . as $pulls
+  | (map(.headRefName)) as $head_branches
+  # Root PRs: their base branch is not another PR head branch.
+  | [.[] | select(.baseRefName as $base | $head_branches | index($base) | not)] as $roots
+  | [$roots[] | [., (. | follow_chain($pulls))]] as $chains
+  | ($chains | length) as $chain_count
+
+  | .[0].repository.nameWithOwner,
+    ($chains | to_entries[] |
+      .key as $chain_index |
+      .value |
+      ($chain_index == $chain_count - 1) as $is_last_chain |
+      to_entries[] |
+      .key as $depth | .value |
+      (
+        if $depth == 0 then
+          if $is_last_chain then "└── " else "├── " end
+        else
+          (if $is_last_chain then "    " else "│   " end)
+          + ("    " * ($depth - 1)) + "└── "
+        end
+      ) as $connector |
+      [$connector, (.number | tostring), .title, .url, (.author.login // "unknown")]
+      | @tsv
+    )
 '
 
 gh api graphql --field query="${graphql_query}" \
   | jq --raw-output "${jq_filter}" \
-  | while IFS=$'\t' read -r url title; do
-      if [ -z "${title}" ]; then
+  | while IFS=$'\t' read -r connector number title url author; do
+      if [ -z "${number}" ]; then
         # Lines without a tab are repository headers.
-        echo "${url}"
+        echo "${connector}"
       else
         # OSC 8 hyperlink: make the title clickable in supported terminals.
-        printf '  \033]8;;%s\033\\%s\033]8;;\033\\\n' "${url}" "${title}"
+        printf '    %s\033]8;;%s\033\\#%s %s\033]8;;\033\\ (%s)\n' \
+          "${connector}" "${url}" "${number}" "${title}" "${author}"
       fi
     done
