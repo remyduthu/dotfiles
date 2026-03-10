@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-# List open pull requests requesting the authenticated user's review.
-# Excludes drafts and already-approved PRs. Groups by repository, detects Mergify stacks.
+# List open pull requests requesting the authenticated user's review. Excludes
+# drafts, already-approved PRs, and PRs not targeting the default branch. Groups
+# results by repository.
 #
 # Usage: gh-reviews [--browse]
-#   --browse  Open all root PRs (top of each stack or standalone) in the browser.
+#   --browse  Open all listed PRs in the browser.
 
 set -euo pipefail
 
@@ -13,11 +14,10 @@ if [ "${1:-}" = "--browse" ]; then
   open_in_browser=true
 fi
 
-login=$(gh api user --jq .login)
-
-# Fetch open PRs requesting the user's review, excluding drafts.
-# The `reviews` subquery fetches the user's last review to filter out already-approved PRs.
-# `baseRefName` and `headRefName` are used to detect Mergify stack relationships.
+# Fetch open PRs requesting the user's review, excluding drafts. The `reviews`
+# subquery fetches the user's last review to filter out already-approved PRs.
+# `baseRefName` and `defaultBranchRef` are compared to only keep PRs targeting
+# the default branch.
 graphql_query="
   query {
     search(query: \"is:open is:pr review-requested:@me draft:false\", type: ISSUE, first: 50) {
@@ -27,10 +27,9 @@ graphql_query="
           title
           url
           baseRefName
-          headRefName
           author { login }
           repository { nameWithOwner defaultBranchRef { name } }
-          reviews(author: \"${login}\", last: 1, states: [APPROVED]) {
+          reviews(author: \"$(gh api user --jq .login)\", last: 1, states: [APPROVED]) {
             totalCount
           }
         }
@@ -39,114 +38,36 @@ graphql_query="
   }
 "
 
-# Dollar signs below are jq variables, not shell expansions.
-
-# Build Mergify stack chains and format as tab-separated lines.
-# Lines without a tab are repository headers (detected by an empty second field).
+# Filter out approved PRs and PRs not targeting the default branch, then group
+# by repository.
 #
-# Stacks are detected by matching each PR's base branch to another PR's head branch.
-# A root PR is one that targets the default branch and has no parent in the result set.
-# Orphaned stack children (whose parent was already approved) are hidden entirely.
-# From each root, `follow_chain` recursively follows head-to-base links to build a chain.
-#
-# Output columns: connector, depth, number, title, url, author.
 # shellcheck disable=SC2016
-tree_filter='
-  # Recursively follow the Mergify stack from a given PR.
-  # Each child PR targets the current PR head branch as its base branch.
-  def follow_chain($pulls):
-    . as $current
-    | [$pulls[] | select(.baseRefName == $current.headRefName)]
-    | if length > 0 then .[0], (.[0] | follow_chain($pulls))
-      else empty end;
-
-  # Build a tree connector string for a given depth and position.
-  # depth=0: root level uses "├── " or "└── ".
-  # depth>0: prepends a continuation prefix ("│   " or "    ") for the root level,
-  #          then "    " for each additional depth, and always ends with "└── "
-  #          since stacks are linear chains (each node has at most one child).
-  def tree_connector($depth; $is_last_chain):
-    if $depth == 0 then
-      if $is_last_chain then "└── " else "├── " end
-    else
-      (if $is_last_chain then "    " else "│   " end)
-      + ("    " * ($depth - 1)) + "└── "
-    end;
-
-  [.data.search.nodes[] | select(.reviews.totalCount == 0)]
+jq_filter='
+  [.data.search.nodes[]
+    | select(.reviews.totalCount == 0)
+    | select(.baseRefName == .repository.defaultBranchRef.name)
+  ]
   | group_by(.repository.nameWithOwner)
   | .[]
-  | . as $pulls
-  | (map(.headRefName)) as $head_branches
-
-  # A root PR targets the default branch, not another PR head branch.
-  # PRs whose base is not the default branch but has no parent in the result set
-  # are orphaned stack children (their parent was already approved) and are hidden.
-  | (.[0].repository.defaultBranchRef.name) as $default_branch
-  | [.[] | select(
-      (.baseRefName as $base | $head_branches | index($base) | not)
-      and .baseRefName == $default_branch
-    )] as $roots
-  | [$roots[] | [., (. | follow_chain($pulls))]] as $chains
-  | ($chains | length) as $chain_count
-
-  | .[0].repository.nameWithOwner,
-    ($chains | to_entries[] |
-      .key as $chain_index |
-      .value |
-      ($chain_index == $chain_count - 1) as $is_last_chain |
-
-      to_entries[] |
-      .key as $depth | .value |
-
-      [ tree_connector($depth; $is_last_chain),
-        ($depth | tostring),
-        (.number | tostring),
-        .title,
-        .url,
-        (.author.login // "unknown")
-      ] | @tsv
-    )
+  | (.[0].repository.nameWithOwner) as $repository
+  | $repository,
+    (.[] | [(.number | tostring), .title, .url, (.author.login // "unknown")] | @tsv)
 '
 
-# Extract URLs of root PRs only (for --browse).
-# shellcheck disable=SC2016
-root_urls_filter='
-  [.data.search.nodes[] | select(.reviews.totalCount == 0)]
-  | group_by(.repository.nameWithOwner)
-  | .[]
-  | . as $pulls
-  | (map(.headRefName)) as $head_branches
-  | (.[0].repository.defaultBranchRef.name) as $default_branch
-  | .[]
-  | select(
-      (.baseRefName as $base | $head_branches | index($base) | not)
-      and .baseRefName == $default_branch
-    )
-  | .url
-'
+api_response=$(gh api graphql --field query="${graphql_query}" | jq --raw-output "${jq_filter}")
 
-# Cache the API response to avoid duplicate requests when --browse is used.
-api_response=$(gh api graphql --field query="${graphql_query}")
+while IFS=$'\t' read -r number title url author; do
+  if [ -z "${title}" ]; then
+    # Lines without a tab are repository headers.
+    echo "${number}"
+  else
+    # OSC 8 hyperlink: make the title clickable in supported terminals.
+    # Format: ESC]8;;<url>ESC\<text>ESC]8;;ESC\
+    printf '  • \033]8;;%s\033\\#%s %s\033]8;;\033\\ by %s\n' \
+      "${url}" "${number}" "${title}" "${author}"
 
-# Render the tree.
-echo "${api_response}" \
-  | jq --raw-output "${tree_filter}" \
-  | while IFS=$'\t' read -r connector depth number title url author; do
-      if [ -z "${depth}" ]; then
-        # Lines without a tab are repository headers.
-        echo "${connector}"
-      else
-        # OSC 8 hyperlink: make the title clickable in supported terminals.
-        # Format: ESC]8;;<url>ESC\<text>ESC]8;;ESC\
-        printf '    %s\033]8;;%s\033\\#%s %s\033]8;;\033\\ (%s)\n' \
-          "${connector}" "${url}" "${number}" "${title}" "${author}"
-      fi
-    done
-
-# Open root PRs in the default browser.
-if [ "${open_in_browser}" = true ]; then
-  echo "${api_response}" \
-    | jq --raw-output "${root_urls_filter}" \
-    | xargs open
-fi
+    if [ "${open_in_browser}" = true ]; then
+      open "${url}"
+    fi
+  fi
+done <<< "${api_response}"
