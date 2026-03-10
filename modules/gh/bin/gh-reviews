@@ -29,7 +29,7 @@ graphql_query="
           baseRefName
           headRefName
           author { login }
-          repository { nameWithOwner }
+          repository { nameWithOwner defaultBranchRef { name } }
           reviews(author: \"${login}\", last: 1, states: [APPROVED]) {
             totalCount
           }
@@ -45,7 +45,8 @@ graphql_query="
 # Lines without a tab are repository headers (detected by an empty second field).
 #
 # Stacks are detected by matching each PR's base branch to another PR's head branch.
-# A root PR is one whose base branch does not match any other PR's head branch.
+# A root PR is one that targets the default branch and has no parent in the result set.
+# Orphaned stack children (whose parent was already approved) are hidden entirely.
 # From each root, `follow_chain` recursively follows head-to-base links to build a chain.
 #
 # Output columns: connector, depth, number, title, url, author.
@@ -78,7 +79,14 @@ tree_filter='
   | . as $pulls
   | (map(.headRefName)) as $head_branches
 
-  | [.[] | select(.baseRefName as $base | $head_branches | index($base) | not)] as $roots
+  # A root PR targets the default branch, not another PR head branch.
+  # PRs whose base is not the default branch but has no parent in the result set
+  # are orphaned stack children (their parent was already approved) and are hidden.
+  | (.[0].repository.defaultBranchRef.name) as $default_branch
+  | [.[] | select(
+      (.baseRefName as $base | $head_branches | index($base) | not)
+      and .baseRefName == $default_branch
+    )] as $roots
   | [$roots[] | [., (. | follow_chain($pulls))]] as $chains
   | ($chains | length) as $chain_count
 
@@ -109,8 +117,12 @@ root_urls_filter='
   | .[]
   | . as $pulls
   | (map(.headRefName)) as $head_branches
+  | (.[0].repository.defaultBranchRef.name) as $default_branch
   | .[]
-  | select(.baseRefName as $base | $head_branches | index($base) | not)
+  | select(
+      (.baseRefName as $base | $head_branches | index($base) | not)
+      and .baseRefName == $default_branch
+    )
   | .url
 '
 
