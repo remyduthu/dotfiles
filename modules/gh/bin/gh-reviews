@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # List open pull requests requesting the authenticated user's review. Excludes
-# drafts, already-approved PRs, and PRs not targeting the default branch. Groups
-# results by repository.
+# drafts, conflicts, already-approved PRs, and PRs with unresolved review
+# threads. Groups results by repository.
 #
 # Usage: gh-reviews [--browse]
 #   --browse  Open all listed PRs in the browser.
@@ -14,39 +14,37 @@ if [ "${1:-}" = "--browse" ]; then
   open_in_browser=true
 fi
 
-# Fetch open PRs requesting the user's review, excluding drafts. The `reviews`
-# subquery fetches the user's last review to filter out already-approved PRs.
-# `baseRefName` and `defaultBranchRef` are compared to only keep PRs targeting
-# the default branch.
-graphql_query="
-  query {
-    search(query: \"is:open is:pr review-requested:@me draft:false\", type: ISSUE, first: 50) {
+# Fetch open PRs requesting the user's review, excluding drafts, conflicts,
+# and unresolved review threads. The `reviews` subquery fetches the user's last
+# review to filter out already-approved PRs.
+search_query='base:main draft:false is:open is:pr -label:conflict -label:"review threads unresolved" review-requested:@me sort:updated-desc'
+author_login=$(gh api user --jq .login)
+
+# shellcheck disable=SC2016
+graphql_query='
+  query($search_query: String!, $author_login: String!) {
+    search(query: $search_query, type: ISSUE, first: 50) {
       nodes {
         ... on PullRequest {
           number
           title
           url
-          baseRefName
           author { login }
-          repository { nameWithOwner defaultBranchRef { name } }
-          reviews(author: \"$(gh api user --jq .login)\", last: 1, states: [APPROVED]) {
+          repository { nameWithOwner }
+          reviews(author: $author_login, last: 1, states: [APPROVED]) {
             totalCount
           }
         }
       }
     }
   }
-"
+'
 
-# Filter out approved PRs and PRs not targeting the default branch, then group
-# by repository.
+# Filter out approved PRs, then group by repository.
 #
 # shellcheck disable=SC2016
 jq_filter='
-  [.data.search.nodes[]
-    | select(.reviews.totalCount == 0)
-    | select(.baseRefName == .repository.defaultBranchRef.name)
-  ]
+  [.data.search.nodes[] | select(.reviews.totalCount == 0)]
   | group_by(.repository.nameWithOwner)
   | .[]
   | (.[0].repository.nameWithOwner) as $repository
@@ -54,7 +52,7 @@ jq_filter='
     (.[] | [(.number | tostring), .title, .url, (.author.login // "unknown")] | @tsv)
 '
 
-api_response=$(gh api graphql --field query="${graphql_query}" | jq --raw-output "${jq_filter}")
+api_response=$(gh api graphql --field query="${graphql_query}" --field search_query="${search_query}" --field author_login="${author_login}" | jq --raw-output "${jq_filter}")
 
 while IFS=$'\t' read -r number title url author; do
   if [ -z "${title}" ]; then
