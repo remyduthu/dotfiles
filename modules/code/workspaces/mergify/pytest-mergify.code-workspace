@@ -17,7 +17,6 @@
     "mypy-type-checker.importStrategy": "fromEnvironment",
 
     // Tests.
-    "python.envFile": "${workspaceFolder}/test.env",
     "python.testing.autoTestDiscoverOnSaveEnabled": true,
     "python.testing.cwd": "${workspaceFolder}",
     "python.testing.pytestEnabled": true,
