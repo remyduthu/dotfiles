@@ -1,0 +1,38 @@
+{
+  "defaultMode": "plan",
+  "disableBypassPermissionsMode": "disable",
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/remyduthu/.config/mergify-cli/claude-hooks/session-start.sh",
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(* --help)",
+      "Bash(* --version)",
+      "Bash(git add *)",
+      "Bash(git switch *)",
+      "Bash(git commit *)",
+      "Bash(mergify *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(uv *)",
+      "Edit",
+      "Read",
+      "WebFetch"
+    ],
+    "ask": [
+      "Bash(git push *)"
+    ]
+  }
+}
