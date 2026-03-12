@@ -23,6 +23,7 @@
       "Bash(git add *)",
       "Bash(git switch *)",
       "Bash(git commit *)",
+      "Bash(grep *)",
       "Bash(mergify *)",
       "Bash(npm *)",
       "Bash(npx *)",
