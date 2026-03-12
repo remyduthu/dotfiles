@@ -54,6 +54,11 @@ jq_filter='
 
 api_response=$(gh api graphql --field query="${graphql_query}" --field search_query="${search_query}" --field author_login="${author_login}" | jq --raw-output "${jq_filter}")
 
+if [ -z "${api_response}" ]; then
+  echo "Nothing to review"
+  exit 0
+fi
+
 while IFS=$'\t' read -r number title url author; do
   if [ -z "${title}" ]; then
     # Lines without a tab are repository headers.
