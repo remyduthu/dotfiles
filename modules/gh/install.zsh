@@ -12,4 +12,5 @@ taskf "Link configuration files"
 link "${DOTFILES_PATH}/modules/gh/config.yml" "${HOME}/.config/gh/config.yml"
 
 taskf "Link scripts"
+link "${DOTFILES_PATH}/modules/gh/bin/gh-daily" "${HOME}/.local/bin/gh-daily"
 link "${DOTFILES_PATH}/modules/gh/bin/gh-reviews" "${HOME}/.local/bin/gh-reviews"

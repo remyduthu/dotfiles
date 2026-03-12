@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+# Output a daily standup summary based on authored GitHub PR activity,
+# split into yesterday and today sections.
+#
+# Usage: gh-daily
+
+set -euo pipefail
+
+today=$(date -u +%Y-%m-%d)
+yesterday=$(date -u -v-1d +%Y-%m-%d)
+
+# Authored PRs updated in the last 2 days.
+authored_query="is:pr author:@me sort:updated-desc updated:>=${yesterday}"
+
+# shellcheck disable=SC2016
+graphql_query='
+  query($authored_query: String!) {
+    search(query: $authored_query, type: ISSUE, first: 30) {
+      nodes {
+        ... on PullRequest {
+          number title url state merged mergedAt createdAt updatedAt isDraft
+          repository { nameWithOwner }
+        }
+      }
+    }
+  }
+'
+
+api_response=$(gh api graphql \
+  --field query="${graphql_query}" \
+  --field authored_query="${authored_query}")
+
+# Classify PRs into yesterday/today buckets using jq.
+# shellcheck disable=SC2016
+output=$(echo "${api_response}" | jq --raw-output --arg today "${today}" --arg yesterday "${yesterday}" '
+  def format_pr:
+    "\(.repository.nameWithOwner)\t\(.number)\t\(.title)\t\(.url)\t\(if .isDraft then "draft" else "" end)";
+
+  .data.search.nodes as $authored |
+
+  # Yesterday.
+  ($authored | map(select(.merged and (.mergedAt | split("T")[0]) == $yesterday))) as $completed_yesterday |
+  ($authored | map(select((.merged | not) and (.createdAt | split("T")[0]) == $yesterday))) as $started_yesterday |
+
+  # Today.
+  ($authored | map(select(.merged and (.mergedAt | split("T")[0]) == $today))) as $completed_today |
+  ($authored | map(
+    select(
+      (.merged | not) and (
+        (.createdAt | split("T")[0]) == $today or
+        ((.state == "OPEN") and (.updatedAt | split("T")[0]) == $today)
+      )
+    )
+  ) | unique_by(.number)) as $started_today |
+
+  "SECTION:Yesterday",
+  "SUBSECTION:Merged",
+  ($completed_yesterday[] | format_pr),
+  "SUBSECTION:Created",
+  ($started_yesterday[] | format_pr),
+  "SECTION:Today",
+  "SUBSECTION:Merged",
+  ($completed_today[] | format_pr),
+  "SUBSECTION:Created",
+  ($started_today[] | format_pr)
+')
+
+current_section=""
+current_subsection=""
+subsection_has_items=false
+
+while IFS=$'\t' read -r first second third fourth fifth; do
+  if [[ "${first}" == SECTION:* ]]; then
+    [ -n "${current_section}" ] && echo
+    printf '\033[1;34m%s\033[0m\n' "${first#SECTION:}"
+    current_section="${first#SECTION:}"
+    current_subsection=""
+  elif [[ "${first}" == SUBSECTION:* ]]; then
+    if [ -n "${current_subsection}" ] && [ "${subsection_has_items}" = false ]; then
+      echo "    (none)"
+    fi
+    printf '  \033[0;37m%s\033[0m\n' "${first#SUBSECTION:}"
+    current_subsection="${first#SUBSECTION:}"
+    subsection_has_items=false
+  else
+    subsection_has_items=true
+
+    # OSC 8 hyperlink.
+    pr_link=$(printf '\033]8;;%s\033\\#%s\033]8;;\033\\' "${fourth}" "${second}")
+    draft_badge=""
+    if [ "${fifth}" = "draft" ]; then
+      draft_badge=$(printf ' \033[0;33m(draft)\033[0m')
+    fi
+    printf '    %s %s \033[0;90m%s\033[0m%s\n' "${pr_link}" "${third}" "${first}" "${draft_badge}"
+  fi
+done <<< "${output}"
+
+# Handle last subsection with no items.
+if [ "${subsection_has_items}" = false ] && [ -n "${current_subsection}" ]; then
+  echo "    (none)"
+fi
