@@ -14,6 +14,39 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "~/.claude/hooks/iterm-tab-color.sh working",
+            "type": "command",
+            "suppressOutput": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "~/.claude/hooks/iterm-tab-color.sh waiting",
+            "type": "command",
+            "suppressOutput": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "~/.claude/hooks/iterm-tab-color.sh reset",
+            "type": "command",
+            "suppressOutput": true
+          }
+        ]
+      }
     ]
   },
   "permissions": {
