@@ -1,0 +1,481 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["humanize"]
+# ///
+
+# Generate and open an HTML dashboard for GitHub pull requests,
+# grouped by repository with keyboard-driven navigation.
+#
+# Usage: gh-reviews-dashboard
+
+import html
+import json
+import subprocess
+import sys
+import webbrowser
+from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+
+import humanize
+
+# --- Config ---
+
+TABS = [
+    ("review", "Review Requests"),
+    ("draft", "Drafts"),
+    ("ready", "Ready"),
+]
+
+SEARCHES = {
+    "draft": "is:pr is:open author:@me draft:true sort:updated-desc",
+    "ready": "is:pr is:open author:@me draft:false sort:updated-desc",
+    "review": "is:pr is:open review-requested:@me draft:false sort:updated-desc",
+}
+
+CI_COLORS = {
+    "SUCCESS": ("#1a7f37", "CI passed"),
+    "FAILURE": ("#cf222e", "CI failed"),
+    "ERROR": ("#cf222e", "CI error"),
+    "PENDING": ("#bf8700", "CI pending"),
+}
+
+REVIEW_COLORS = {
+    "APPROVED": "#1a7f37",
+    "CHANGES_REQUESTED": "#cf222e",
+    "COMMENTED": "#bf8700",
+    "DISMISSED": "#bbb",
+}
+
+GRAPHQL_QUERY = """
+query($search_query: String!, $author_login: String!) {
+  search(query: $search_query, type: ISSUE, first: 50) {
+    nodes {
+      ... on PullRequest {
+        number title body url createdAt updatedAt
+        additions deletions mergeable
+        author { login avatarUrl }
+        repository { nameWithOwner }
+        labels(first: 5) { nodes { name color } }
+        reviews(author: $author_login, last: 1, states: [APPROVED]) {
+          totalCount
+        }
+        latestReviews(first: 10) {
+          nodes { state author { login avatarUrl } }
+        }
+        commits(last: 1) {
+          nodes { commit { statusCheckRollup { state } } }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+# --- Data ---
+
+
+def gh_login() -> str:
+    """Get the authenticated GitHub username."""
+    return subprocess.run(
+        ["gh", "api", "user", "--jq", ".login"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+
+def fetch_prs(search_query: str, author_login: str) -> list[dict]:
+    """Fetch PRs matching a GitHub search query."""
+    result = subprocess.run(
+        ["gh", "api", "graphql",
+         "--field", f"query={GRAPHQL_QUERY}",
+         "--field", f"search_query={search_query}",
+         "--field", f"author_login={author_login}"],
+        capture_output=True, text=True, check=True,
+    )
+    return json.loads(result.stdout)["data"]["search"]["nodes"]
+
+
+# --- Helpers ---
+
+
+def esc(text: str) -> str:
+    """Shorthand for html.escape."""
+    return html.escape(text)
+
+
+def short_date(iso: str) -> str:
+    """'Mar 11' or 'Mar 11, 2025'."""
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    fmt = "%b %-d" if dt.year == datetime.now(timezone.utc).year else "%b %-d, %Y"
+    return dt.strftime(fmt)
+
+
+def ago(iso: str) -> str:
+    """'2 hours ago'."""
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    return humanize.naturaltime(datetime.now(timezone.utc) - dt)
+
+
+def size_label(additions: int, deletions: int) -> str:
+    """Categorize diff size."""
+    total = additions + deletions
+    if total <= 50:
+        return "S"
+    if total <= 200:
+        return "M"
+    if total <= 500:
+        return "L"
+    return "XL"
+
+
+# --- SVG ---
+
+
+def svg(inner: str, title: str = "", size: int = 14) -> str:
+    """Wrap SVG content in a standard icon container."""
+    t = f"<title>{esc(title)}</title>" if title else ""
+    return (
+        f'<svg width="{size}" height="{size}" viewBox="0 0 16 16"'
+        f' style="vertical-align:middle;flex-shrink:0">{t}{inner}</svg>'
+    )
+
+
+def ci_icon(pr: dict) -> str:
+    """CI status dot."""
+    nodes = pr.get("commits", {}).get("nodes", [])
+    if not nodes:
+        return ""
+    rollup = nodes[0].get("commit", {}).get("statusCheckRollup")
+    if not rollup or rollup["state"] not in CI_COLORS:
+        return ""
+
+    color, title = CI_COLORS[rollup["state"]]
+    return f'<span class="ci-dot" style="background:{color}" title="{esc(title)}"></span>'
+
+
+def chevron_svg() -> str:
+    """Collapse/expand chevron."""
+    return svg(
+        '<path d="M6 4l4 4-4 4" fill="none" stroke="currentColor"'
+        ' stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+        size=12,
+    )
+
+
+# --- HTML components ---
+
+
+def render_label(label: dict) -> str:
+    """Label pill with colored dot on white background."""
+    return (
+        f'<span class="label">'
+        f'<span class="dot" style="background:#{esc(label["color"])}"></span>'
+        f'{esc(label["name"])}</span>'
+    )
+
+
+def render_reviewers(pr: dict) -> str:
+    """Stacked reviewer avatars with review-state borders."""
+    reviews = pr.get("latestReviews", {}).get("nodes", [])
+    if not reviews:
+        return ""
+    imgs = []
+    for i, r in enumerate(reviews):
+        color = REVIEW_COLORS.get(r["state"], "#bbb")
+        state = r["state"].lower().replace("_", " ")
+        login = esc(r["author"]["login"])
+        margin = "margin-left:-6px;" if i > 0 else ""
+        imgs.append(
+            f'<img src="{esc(r["author"]["avatarUrl"])}" width="20" height="20"'
+            f' alt="{login}" title="{login}: {state}"'
+            f' style="border-radius:50%;border:2px solid {color};{margin}'
+            f'vertical-align:middle">'
+        )
+    return f'<span class="reviewers">{"".join(imgs)}</span>'
+
+
+def render_size(pr: dict) -> str:
+    """Size badge that reveals +/- on hover."""
+    add, delete = pr.get("additions", 0), pr.get("deletions", 0)
+    if add + delete == 0:
+        return ""
+    label = size_label(add, delete)
+    return (
+        f'<span class="size" title="+{add} -{delete}">'
+        f'<span class="size-label">{label}</span>'
+        f'<span class="size-diff">'
+        f'<span class="green">+{add}</span>/<span class="red">-{delete}</span>'
+        f'</span></span>'
+    )
+
+
+def render_row(pr: dict) -> str:
+    """Single PR row."""
+    url = esc(pr["url"])
+    login = esc(pr["author"]["login"])
+    body = esc(pr.get("body") or "")
+
+    conflict = ""
+    if pr.get("mergeable") == "CONFLICTING":
+        conflict = '<span class="conflict" title="Merge conflict">!</span>'
+
+    return f"""<div class="row" data-url="{url}">
+  <div class="left">
+    <span class="id">#{pr["number"]}</span>
+    <a href="{url}" title="{body}" target="_blank" class="title">{esc(pr["title"])}</a>
+  </div>
+  <div class="right">
+    {"".join(render_label(l) for l in pr.get("labels", {}).get("nodes", []))}
+    {conflict}
+    {ci_icon(pr)}
+    {render_size(pr)}
+    {render_reviewers(pr)}
+    <img class="avatar" src="{esc(pr["author"]["avatarUrl"])}" width="20" height="20"
+         alt="{login}" title="{login}">
+    <span class="date" title="{ago(pr["updatedAt"])}">{short_date(pr["updatedAt"])}</span>
+  </div>
+</div>"""
+
+
+def render_group(repo: str, prs: list[dict], category: str) -> str:
+    """Collapsible repository group."""
+    return f"""<div class="group" data-category="{category}">
+  <div class="group-head" onclick="this.parentElement.classList.toggle('collapsed')">
+    {chevron_svg()}
+    <span class="repo">{esc(repo)}</span>
+    <span class="count">{len(prs)}</span>
+  </div>
+  <div class="rows">
+    {"".join(render_row(pr) for pr in prs)}
+  </div>
+</div>"""
+
+
+# --- Page ---
+
+
+CSS = """
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Helvetica, Arial, sans-serif;
+  background: #f5f5f5; color: #1a1a1a; font-size: 13px; font-weight: 450;
+  -webkit-font-smoothing: antialiased;
+  margin: 0; padding: 8px; height: 100vh;
+}
+
+.app {
+  background: #fcfcfd; border: 0.5px solid #e0e0e0; border-radius: 12px;
+  height: 100%; overflow-y: auto; display: flex; flex-direction: column;
+  box-shadow: 0 3px 6px -2px rgba(0,0,0,.02), 0 1px 1px rgba(0,0,0,.04);
+}
+
+/* Tabs. */
+.header { padding: 16px 20px 0; }
+.tabs { display: flex; gap: 2px; padding-bottom: 12px; }
+.tab {
+  padding: 4px 10px; font-size: 13px; font-weight: 450; line-height: 1.5;
+  color: #9c9ea3; cursor: pointer;
+  border: none; border-radius: 5px; background: none;
+}
+.tab:hover { color: #1a1a1a; background: rgba(0,0,0,.04); }
+.tab.active { color: #1a1a1a; background: rgba(0,0,0,.06); font-weight: 500; }
+.separator { width: 1px; height: 14px; background: #e0e0e0; align-self: center; margin: 0 6px; }
+
+/* Groups. */
+.content { flex: 1; }
+.group + .group { border-top: 1px solid #f0f0f0; }
+.group-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px; cursor: pointer; user-select: none;
+  background: rgba(0,0,0,.02);
+}
+.group-head:hover { background: rgba(0,0,0,.035); }
+.group-head svg { transition: transform .15s; color: #bbb; }
+.group:not(.collapsed) svg { transform: rotate(90deg); }
+.group.collapsed .rows { display: none; }
+.repo { font-weight: 500; }
+.count { color: #9c9ea3; }
+
+/* Rows. */
+.row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 20px 6px 48px; min-height: 38px;
+  cursor: pointer; transition: background .1s;
+}
+.row:hover { background: rgba(0,0,0,.015); }
+.row.selected { background: rgba(92,120,255,.06); }
+.left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+.right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-left: 16px; }
+.id { color: #9c9ea3; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.title {
+  color: #1a1a1a; text-decoration: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.title:hover { text-decoration: underline; }
+
+/* Labels. */
+.label {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 999px;
+  padding: 2px 8px 2px 6px; font-size: 12px; color: #5f6166; white-space: nowrap;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ci-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Meta. */
+.conflict { color: #cf222e; font-weight: 600; }
+.reviewers { display: inline-flex; align-items: center; }
+.avatar { border-radius: 50%; vertical-align: middle; }
+.date { color: #9c9ea3; white-space: nowrap; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+.size { color: #9c9ea3; white-space: nowrap; font-size: 12px; }
+.size-diff { display: none; font-size: 11px; }
+.size:hover .size-label { display: none; }
+.size:hover .size-diff { display: inline; }
+.green { color: #1a7f37; }
+.red { color: #cf222e; }
+
+/* Keyboard hints. */
+.hints {
+  position: fixed; bottom: 16px; right: 20px;
+  display: flex; gap: 12px; font-size: 11px; color: #9c9ea3;
+  background: #fcfcfd; padding: 5px 10px; border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 3px 6px -2px rgba(0,0,0,.02), 0 1px 1px rgba(0,0,0,.04);
+}
+kbd {
+  background: rgba(0,0,0,.04); border: 1px solid #e0e0e0;
+  border-radius: 3px; padding: 1px 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; color: #5f6166;
+}
+"""
+
+JS = """
+const tabs = [...document.querySelectorAll(".tab")];
+const order = tabs.map(t => t.dataset.filter);
+let rows = [], cur = -1;
+
+function refresh() {
+  rows = [...document.querySelectorAll(".row")].filter(r => r.offsetParent !== null);
+  cur = -1;
+}
+
+function activate(filter) {
+  tabs.forEach(t => t.classList.toggle("active", t.dataset.filter === filter));
+  document.querySelectorAll(".group").forEach(g => {
+    g.style.display = g.dataset.category === filter ? "" : "none";
+  });
+  refresh();
+}
+
+function select(i) {
+  if (i < 0 || i >= rows.length) return;
+  rows.forEach(r => r.classList.remove("selected"));
+  cur = i;
+  rows[cur].classList.add("selected");
+  rows[cur].scrollIntoView({ block: "nearest" });
+}
+
+function activeIndex() {
+  const f = document.querySelector(".tab.active")?.dataset.filter;
+  return Math.max(0, order.indexOf(f));
+}
+
+tabs.forEach(t => t.addEventListener("click", () => activate(t.dataset.filter)));
+activate(order[0]);
+
+document.addEventListener("keydown", e => {
+  switch (e.key) {
+    case "[": activate(order[(activeIndex() - 1 + order.length) % order.length]); break;
+    case "]": activate(order[(activeIndex() + 1) % order.length]); break;
+    case "j": select(cur + 1); break;
+    case "k": select(cur - 1); break;
+    case "o": if (cur >= 0) window.open(rows[cur].dataset.url, "_blank"); break;
+  }
+});
+
+document.querySelectorAll(".row").forEach(r => {
+  r.addEventListener("click", () => { const i = rows.indexOf(r); if (i >= 0) select(i); });
+});
+"""
+
+
+def render_page(prs_by_category: dict[str, list[dict]]) -> str:
+    """Assemble the full HTML page."""
+    total = sum(len(v) for v in prs_by_category.values())
+
+    groups = []
+    for cat, _ in TABS:
+        by_repo: dict[str, list[dict]] = defaultdict(list)
+        for pr in prs_by_category.get(cat, []):
+            by_repo[pr["repository"]["nameWithOwner"]].append(pr)
+        for repo, repo_prs in sorted(by_repo.items()):
+            groups.append(render_group(repo, repo_prs, cat))
+
+    tab_html = []
+    for i, (key, label) in enumerate(TABS):
+        if i == 1:
+            tab_html.append('<div class="separator"></div>')
+        active = " active" if i == 0 else ""
+        tab_html.append(f'<div class="tab{active}" data-filter="{key}">{esc(label)}</div>')
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PRs ({total})</title>
+<meta http-equiv="refresh" content="300">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='none' stroke='%235f6166' stroke-width='1.5'/><path d='M5.5 8.5 L7 10.5 L10.5 5.5' fill='none' stroke='%235f6166' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<style>{CSS}</style>
+</head>
+<body>
+<div class="app">
+  <div class="header"><div class="tabs">{"".join(tab_html)}</div></div>
+  <div class="content">{"".join(groups)}</div>
+</div>
+<div class="hints">
+  <span><kbd>[</kbd><kbd>]</kbd> switch tab</span>
+  <span><kbd>j</kbd><kbd>k</kbd> navigate</span>
+  <span><kbd>o</kbd> open</span>
+  <span style="color:#ccc">{esc(now)}</span>
+</div>
+<script>{JS}</script>
+</body>
+</html>"""
+
+
+# --- Main ---
+
+
+DASHBOARD_PATH = Path.home() / ".cache" / "gh-reviews-dashboard" / "index.html"
+
+
+def main():
+    login = gh_login()
+
+    prs: dict[str, list[dict]] = {}
+    for cat, query in SEARCHES.items():
+        results = fetch_prs(query, login)
+        if cat == "review":
+            results = [
+                pr for pr in results
+                if pr.get("reviews", {}).get("totalCount", 0) == 0
+            ]
+        prs[cat] = results
+
+    DASHBOARD_PATH.parent.mkdir(parents=True, exist_ok=True)
+    DASHBOARD_PATH.write_text(render_page(prs))
+
+    # Only open browser on manual runs, not when invoked by launchd.
+    if "--no-open" not in sys.argv:
+        webbrowser.open(f"file://{DASHBOARD_PATH}")
+
+
+if __name__ == "__main__":
+    main()
