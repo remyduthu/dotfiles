@@ -14,8 +14,8 @@ reset_tab_color() {
 }
 
 case "${1:-}" in
-  working)  set_tab_color 110 160 220 ;;
-  waiting)  set_tab_color 225 175 95 ;;
+  working)  set_tab_color 40 105 131 ;;
+  waiting)  set_tab_color 234 157 52 ;;
   reset)    reset_tab_color ;;
   *)        echo "Usage: $0 {working|waiting|reset}" >&2; exit 1 ;;
 esac

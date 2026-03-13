@@ -19,7 +19,7 @@
       {
         "hooks": [
           {
-            "command": "~/.claude/hooks/iterm-tab-color.sh working",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh working",
             "type": "command",
             "suppressOutput": true
           }
@@ -30,7 +30,7 @@
       {
         "hooks": [
           {
-            "command": "~/.claude/hooks/iterm-tab-color.sh waiting",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh waiting",
             "type": "command",
             "suppressOutput": true
           }
@@ -41,7 +41,7 @@
       {
         "hooks": [
           {
-            "command": "~/.claude/hooks/iterm-tab-color.sh reset",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh reset",
             "type": "command",
             "suppressOutput": true
           }
