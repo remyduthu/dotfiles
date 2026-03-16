@@ -53,9 +53,11 @@
     "allow": [
       "Bash(* --help)",
       "Bash(* --version)",
+      "Bash(cat *)",
+      "Bash(find *)",
       "Bash(git add *)",
-      "Bash(git switch *)",
       "Bash(git commit *)",
+      "Bash(git switch *)",
       "Bash(grep *)",
       "Bash(mergify *)",
       "Bash(npm *)",
