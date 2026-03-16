@@ -25,13 +25,13 @@ import humanize
 TABS = [
     ("review", "Review Requests"),
     ("draft", "Drafts"),
-    ("ready", "Ready"),
+    ("open", "Open"),
 ]
 
 SEARCHES = {
     "draft": "is:pr is:open author:@me draft:true sort:updated-desc",
-    "ready": "is:pr is:open author:@me draft:false sort:updated-desc",
-    "review": "is:pr is:open review-requested:@me draft:false sort:updated-desc",
+    "open": "is:pr is:open author:@me draft:false sort:updated-desc",
+    "review": 'is:pr is:open review-requested:@me draft:false base:main status:success -label:conflict -label:"review threads unresolved" sort:updated-desc',
 }
 
 CI_COLORS = {
@@ -54,7 +54,7 @@ query($search_query: String!, $author_login: String!) {
     nodes {
       ... on PullRequest {
         number title body url createdAt updatedAt
-        additions deletions mergeable
+        additions deletions mergeable baseRefName
         author { login avatarUrl }
         repository { nameWithOwner }
         labels(first: 5) { nodes { name color } }
@@ -211,7 +211,7 @@ def render_size(pr: dict) -> str:
     )
 
 
-def render_row(pr: dict) -> str:
+def render_row(pr: dict, category: str) -> str:
     """Single PR row."""
     url = esc(pr["url"])
     login = esc(pr["author"]["login"])
@@ -221,6 +221,8 @@ def render_row(pr: dict) -> str:
     if pr.get("mergeable") == "CONFLICTING":
         conflict = '<span class="conflict" title="Merge conflict">!</span>'
 
+    ci = ci_icon(pr) if category != "review" else ""
+
     return f"""<div class="row" data-url="{url}">
   <div class="left">
     <span class="id">#{pr["number"]}</span>
@@ -229,7 +231,7 @@ def render_row(pr: dict) -> str:
   <div class="right">
     {"".join(render_label(l) for l in pr.get("labels", {}).get("nodes", []))}
     {conflict}
-    {ci_icon(pr)}
+    {ci}
     {render_size(pr)}
     {render_reviewers(pr)}
     <img class="avatar" src="{esc(pr["author"]["avatarUrl"])}" width="20" height="20"
@@ -248,7 +250,7 @@ def render_group(repo: str, prs: list[dict], category: str) -> str:
     <span class="count">{len(prs)}</span>
   </div>
   <div class="rows">
-    {"".join(render_row(pr) for pr in prs)}
+    {"".join(render_row(pr, category) for pr in prs)}
   </div>
 </div>"""
 
@@ -406,7 +408,7 @@ document.querySelectorAll(".row").forEach(r => {
 
 def render_page(prs_by_category: dict[str, list[dict]]) -> str:
     """Assemble the full HTML page."""
-    total = sum(len(v) for v in prs_by_category.values())
+    total = len(prs_by_category.get("review", []))
 
     groups = []
     for cat, _ in TABS:

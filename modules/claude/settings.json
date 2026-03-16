@@ -1,54 +1,4 @@
 {
-  "defaultMode": "plan",
-  "disableBypassPermissionsMode": "disable",
-  "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "/Users/remyduthu/.config/mergify-cli/claude-hooks/session-start.sh",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh working",
-            "type": "command",
-            "suppressOutput": true
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh waiting",
-            "type": "command",
-            "suppressOutput": true
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh reset",
-            "type": "command",
-            "suppressOutput": true
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(* --help)",
@@ -63,6 +13,7 @@
       "Bash(npm *)",
       "Bash(npx *)",
       "Bash(uv *)",
+      "Bash(uv run poe test *)",
       "Edit",
       "Read",
       "WebFetch"
@@ -70,5 +21,53 @@
     "ask": [
       "Bash(git push *)"
     ]
-  }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/remyduthu/.config/mergify-cli/claude-hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh working"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh waiting"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh reset"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "defaultMode": "plan",
+  "disableBypassPermissionsMode": "disable"
 }
