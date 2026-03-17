@@ -1,10 +1,12 @@
 {
   "permissions": {
     "allow": [
+      "Bash(.agents/skills/prod-sql-query/scripts/query-prod.sh *)",
       "Bash(* --help)",
       "Bash(* --version)",
       "Bash(cat *)",
       "Bash(find *)",
+      "Bash(gh run view *)",
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git switch *)",
@@ -29,36 +31,6 @@
           {
             "type": "command",
             "command": "/Users/remyduthu/.config/mergify-cli/claude-hooks/session-start.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh working"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh waiting"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/remyduthu/.claude/hooks/iterm-tab-color.sh reset"
           }
         ]
       }

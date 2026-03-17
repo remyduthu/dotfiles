@@ -1991,6 +1991,8 @@
 				<key>Red Component</key>
 				<real>0.92156863212585449</real>
 			</dict>
+			<key>Badge Text</key>
+			<string></string>
 			<key>Blink Allowed</key>
 			<true/>
 			<key>Blinking Cursor</key>
@@ -2238,6 +2240,8 @@
 			<string>5A985DB7-36BE-419F-8345-DB577396F34C</string>
 			<key>Horizontal Spacing</key>
 			<real>1</real>
+			<key>Icon</key>
+			<integer>0</integer>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Initial Use Transparency</key>
