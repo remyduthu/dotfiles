@@ -6,9 +6,15 @@
       "Bash(* --version)",
       "Bash(cat *)",
       "Bash(find *)",
-      "Bash(gh run view *)",
+      "Bash(gh * view *)",
+      "Bash(gh api */comments *)",
+      "Bash(gh pr diff *)",
+      "Bash(git * show *)",
       "Bash(git add *)",
+      "Bash(git checkout *)",
       "Bash(git commit *)",
+      "Bash(git rebase *)",
+      "Bash(git show *)",
       "Bash(git switch *)",
       "Bash(grep *)",
       "Bash(mergify *)",
@@ -17,6 +23,9 @@
       "Bash(uv *)",
       "Bash(uv run poe test *)",
       "Edit",
+      "mcp__linear-server__get_*",
+      "mcp__linear-server__list_*",
+      "mcp__linear-server__search_*",
       "Read",
       "WebFetch"
     ],
@@ -37,8 +46,9 @@
     ]
   },
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
   },
   "defaultMode": "plan",
   "disableBypassPermissionsMode": "disable"
