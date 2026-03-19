@@ -1269,7 +1269,7 @@
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>LeftTabBarWidth</key>
-	<real>278</real>
+	<real>320</real>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C_selection</key>
@@ -2775,7 +2775,7 @@
 	<key>TabStyleWithAutomaticOption</key>
 	<integer>5</integer>
 	<key>TabViewType</key>
-	<integer>0</integer>
+	<integer>2</integer>
 	<key>TerminalMargin</key>
 	<integer>8</integer>
 	<key>TerminalVMargin</key>
