@@ -4,7 +4,7 @@
 # SaaS workflow. Polls GitHub Actions runs until the merge commit is included
 # in a successful deployment, then sends a macOS notification.
 #
-# Usage: gh watch-mergify-engine-deployment <PR-NUMBER>
+# Usage: gh watch-mergify-engine-deployment [PR-NUMBER]
 
 set -euo pipefail
 
@@ -13,12 +13,23 @@ POLL_INTERVAL_SECONDS=30
 TIMEOUT_SECONDS=1800
 REPOSITORY_NAME="Mergifyio/engine"
 
-if [ $# -ne 1 ]; then
-  echo "Usage: gh watch-mergify-engine-deployment <PR-NUMBER>" >&2
-  exit 1
-fi
+if [ $# -ge 1 ]; then
+  pull_request_number="$1"
+else
+  # Fetch the last merged PR authored by the current user.
+  pull_request_number=$(gh pr list \
+    --repo "${REPOSITORY_NAME}" \
+    --author "@me" \
+    --state merged \
+    --limit 1 \
+    --json number \
+    --jq '.[0].number')
 
-pull_request_number="$1"
+  if [ -z "${pull_request_number}" ]; then
+    echo "No merged pull request found for current user" >&2
+    exit 1
+  fi
+fi
 
 # Fetch pull request metadata.
 pull_request_json=$(gh pr view "${pull_request_number}" --repo "${REPOSITORY_NAME}" --json mergeCommit,mergedAt,state,number,title)
