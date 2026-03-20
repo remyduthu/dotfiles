@@ -22,6 +22,7 @@ aliases:
     daily: '!gh-daily'
     reviews: '!gh-reviews "$@"'
     reviews-dashboard: '!gh-reviews-dashboard'
+    watch-mergify-engine-deployment: '!gh-watch-mergify-engine-deployment "$@"'
 
 # The path to a unix socket through which to send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
 http_unix_socket:

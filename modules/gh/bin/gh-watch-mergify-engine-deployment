@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+# Watch for a merged pull request to be deployed to production via the Docker
+# SaaS workflow. Polls GitHub Actions runs until the merge commit is included
+# in a successful deployment, then sends a macOS notification.
+#
+# Usage: gh watch-mergify-engine-deployment <PR-NUMBER>
+
+set -euo pipefail
+
+WORKFLOW_NAME="Docker SaaS"
+POLL_INTERVAL_SECONDS=30
+TIMEOUT_SECONDS=1800
+REPOSITORY_NAME="Mergifyio/engine"
+
+if [ $# -ne 1 ]; then
+  echo "Usage: gh watch-mergify-engine-deployment <PR-NUMBER>" >&2
+  exit 1
+fi
+
+pull_request_number="$1"
+
+# Fetch pull request metadata.
+pull_request_json=$(gh pr view "${pull_request_number}" --repo "${REPOSITORY_NAME}" --json mergeCommit,mergedAt,state,number,title)
+
+state=$(echo "${pull_request_json}" | jq --raw-output '.state')
+if [ "${state}" != "MERGED" ]; then
+  printf '\033[0;31mPull request is not merged (state: %s)\033[0m\n' "${state}" >&2
+  exit 1
+fi
+
+merge_sha=$(echo "${pull_request_json}" | jq --raw-output '.mergeCommit.oid')
+merged_at=$(echo "${pull_request_json}" | jq --raw-output '.mergedAt')
+pull_request_title=$(echo "${pull_request_json}" | jq --raw-output '.title')
+
+# Format the merge timestamp as a relative duration (e.g. "3 minutes ago").
+merged_at_epoch=$(date -jf "%Y-%m-%dT%H:%M:%SZ" "${merged_at}" "+%s")
+now_epoch=$(date "+%s")
+seconds_ago=$((now_epoch - merged_at_epoch))
+if [ "${seconds_ago}" -lt 60 ]; then
+  merged_ago="just now"
+elif [ "${seconds_ago}" -lt 3600 ]; then
+  minutes=$((seconds_ago / 60))
+  [ "${minutes}" -eq 1 ] && merged_ago="1 minute ago" || merged_ago="${minutes} minutes ago"
+elif [ "${seconds_ago}" -lt 86400 ]; then
+  hours=$((seconds_ago / 3600))
+  [ "${hours}" -eq 1 ] && merged_ago="1 hour ago" || merged_ago="${hours} hours ago"
+else
+  days=$((seconds_ago / 86400))
+  [ "${days}" -eq 1 ] && merged_ago="1 day ago" || merged_ago="${days} days ago"
+fi
+
+printf '#%s · %s\n' "${pull_request_number}" "${pull_request_title}"
+printf '\033[0;90m├ Merged %s (%s)\033[0m\n' "${merged_ago}" "${merge_sha:0:12}"
+
+# Send a macOS notification.
+notify() {
+  local message="$1"
+  osascript -e "display notification \"${message}\" with title \"Watch Mergify Engine Deployment\"" 2>/dev/null || true
+}
+
+# Print the deployment result and notify.
+print_deployed() {
+  local run_url="$1"
+  printf '└ \033]8;;%s\033\\Deployed\033]8;;\033\\\n' "${run_url}"
+  notify "#${pull_request_number} deployed"
+}
+
+elapsed_seconds=0
+
+while [ "${elapsed_seconds}" -lt "${TIMEOUT_SECONDS}" ]; do
+  # Fetch recent successful runs completed after the pull request merge time.
+  runs=$(gh run list \
+    --repo "${REPOSITORY_NAME}" \
+    --workflow="${WORKFLOW_NAME}" \
+    --branch=main \
+    --status=success \
+    --limit=5 \
+    --json headSha,createdAt,url)
+
+  # Check each run for commit ancestry.
+  for head_sha in $(echo "${runs}" | jq --raw-output '.[].headSha'); do
+    run_url=$(echo "${runs}" | jq --raw-output --arg sha "${head_sha}" '.[] | select(.headSha == $sha) | .url')
+
+    if [ "${head_sha}" = "${merge_sha}" ]; then
+      print_deployed "${run_url}"
+      exit 0
+    fi
+
+    # Check if merge commit is an ancestor of the deploy head.
+    status=$(gh api "repos/${REPOSITORY_NAME}/compare/${merge_sha}...${head_sha}" --jq '.status' 2>/dev/null || echo "error")
+
+    if [ "${status}" = "ahead" ] || [ "${status}" = "identical" ]; then
+      print_deployed "${run_url}"
+      exit 0
+    fi
+  done
+
+  printf '\r\033[K\033[0;90m└ Waiting  %d/%ds\033[0m' "${elapsed_seconds}" "${TIMEOUT_SECONDS}"
+  sleep "${POLL_INTERVAL_SECONDS}"
+  elapsed_seconds=$((elapsed_seconds + POLL_INTERVAL_SECONDS))
+done
+
+printf '\r\033[K\033[0;31m└ Timed out\033[0m\n'
+notify "#${pull_request_number} timed out"
+exit 1
