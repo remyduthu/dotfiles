@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Scaffold worktrees for the current repository.
-# If worktrees or branches already exist, reset each worktree to its dedicated branch.
 
 set -euo pipefail
 
@@ -16,18 +15,15 @@ setup_worktree() {
     local worktree_name="${repository_name}-${1}"
     local worktree_path="${worktrees_directory}/${worktree_name}"
 
-    # Remove the existing worktree to allow branch reset.
-    if [ -d "${worktree_path}" ]; then
-        git worktree remove --force "${worktree_path}"
+    # Create the branch if it doesn't exist.
+    if ! git show-ref --verify --quiet "refs/heads/${worktree_name}"; then
+        git branch "${worktree_name}" "${default_branch}"
     fi
 
-    # Reset the branch to the default branch.
-    if git show-ref --verify --quiet "refs/heads/${worktree_name}"; then
-        git branch -D "${worktree_name}"
+    # Create the worktree if it doesn't exist.
+    if [ ! -d "${worktree_path}" ]; then
+        git worktree add "${worktree_path}" "${worktree_name}"
     fi
-    git branch "${worktree_name}" "${default_branch}"
-
-    git worktree add "${worktree_path}" "${worktree_name}"
 }
 
 setup_worktree 1
