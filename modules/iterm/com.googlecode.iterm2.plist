@@ -24,6 +24,8 @@
 	<integer>128000</integer>
 	<key>AitermURL</key>
 	<string>https://api.openai.com/v1/responses</string>
+	<key>AllowClipboardAccess</key>
+	<true/>
 	<key>Custom Color Presets</key>
 	<dict>
 		<key>Dracula</key>
@@ -1269,7 +1271,7 @@
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>LeftTabBarWidth</key>
-	<real>547</real>
+	<real>320</real>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C_selection</key>

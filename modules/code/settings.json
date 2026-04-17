@@ -1,9 +1,15 @@
 {
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua"
   },
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
   },
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
@@ -13,6 +19,7 @@
   },
   "chat.agent.maxRequests": 1000,
   "chat.commandCenter.enabled": false,
+  "diffEditor.renderSideBySide": false,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.organizeImports": "always"
@@ -28,10 +35,39 @@
   "editor.minimap.enabled": false,
   "editor.renderWhitespace": "trailing",
   "extensions.experimental.affinity": {
-    "asvetliakov.vscode-neovim": 1,
+    "asvetliakov.vscode-neovim": 1
   },
   "extensions.ignoreRecommendations": true,
+  "git.decorations.enabled": false,
   "git.openRepositoryInParentFolders": "always",
+  "githubPullRequests.pullBranch": "never",
+  "gitlens.codeLens.enabled": false,
+  "gitlens.currentLine.enabled": false,
+  "gitlens.currentLine.pullRequests.enabled": false,
+  "gitlens.rebaseEditor.openOnPausedRebase": false,
+  "gitlens.views.commits.pullRequests.enabled": false,
+  "gitlens.views.commits.showBranchComparison": false,
+  "gitlens.views.scm.grouped.views": {
+    "branches": true,
+    "commits": true,
+    "contributors": true,
+    "fileHistory": true,
+    "launchpad": true,
+    "remotes": true,
+    "repositories": true,
+    "searchAndCompare": true,
+    "stashes": true,
+    "tags": true,
+    "worktrees": true
+  },
+  "json.schemaDownload.trustedDomains": {
+    "https://biomejs.dev": true,
+    "https://json-schema.org/": true,
+    "https://json.schemastore.org/": true,
+    "https://raw.githubusercontent.com/": true,
+    "https://schemastore.azurewebsites.net/": true,
+    "https://www.schemastore.org/": true
+  },
   "python.analysis.autoFormatStrings": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.fixAll": [
@@ -42,6 +78,7 @@
   "python.analysis.typeCheckingMode": "strict",
   "python.languageServer": "Pylance",
   "rewrap.wrappingColumn": 80,
+  "scm.repositories.selectionMode": "single",
   "window.commandCenter": false,
   "workbench.activityBar.location": "hidden",
   "workbench.colorTheme": "Rosé Pine Dawn",
@@ -59,42 +96,5 @@
       "docker-compose.yml",
       "docker-compose.yaml"
     ]
-  },
-  "diffEditor.renderSideBySide": false,
-  "chat.viewSessions.orientation": "stacked",
-  "git.blame.editorDecoration.enabled": true,
-  "git.blame.statusBarItem.enabled": true,
-  "git.decorations.enabled": false,
-  "gitlens.currentLine.enabled": false,
-  "gitlens.currentLine.pullRequests.enabled": false,
-  "gitlens.codeLens.enabled": false,
-  "gitlens.rebaseEditor.openOnPausedRebase": false,
-  "gitlens.views.scm.grouped.views": {
-    "commits": true,
-    "branches": true,
-    "remotes": true,
-    "stashes": true,
-    "tags": true,
-    "worktrees": true,
-    "contributors": true,
-    "fileHistory": true,
-    "repositories": true,
-    "searchAndCompare": true,
-    "launchpad": true
-  },
-  "[sql]": {
-    "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
-  },
-  "json.schemaDownload.trustedDomains": {
-    "https://schemastore.azurewebsites.net/": true,
-    "https://raw.githubusercontent.com/": true,
-    "https://www.schemastore.org/": true,
-    "https://json.schemastore.org/": true,
-    "https://json-schema.org/": true,
-    "https://biomejs.dev": true
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "workbench.secondarySideBar.defaultVisibility": "hidden"
+  }
 }

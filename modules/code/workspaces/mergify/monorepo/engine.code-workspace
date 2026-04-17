@@ -1,7 +1,7 @@
 {
   "folders": [
     {
-      "path": "/Users/remyduthu/dev/mergify/engine/"
+      "path": "/Users/remyduthu/dev/mergify/monorepo/engine/"
     }
   ],
   "settings": {
@@ -9,7 +9,6 @@
     "[python]": {
       "editor.defaultFormatter": "charliermarsh.ruff"
     },
-
     // Lint.
     "ruff.lint.enable": true,
     "editor.codeActionsOnSave": {
@@ -19,7 +18,6 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "off", // Use Mypy instead.
     "mypy-type-checker.importStrategy": "fromEnvironment",
-
     // Tests.
     "python.envFile": "${workspaceFolder}/test.env",
     "python.testing.autoTestDiscoverOnSaveEnabled": true,

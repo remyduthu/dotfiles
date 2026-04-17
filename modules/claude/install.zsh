@@ -14,4 +14,5 @@ link "${DOTFILES_PATH}/modules/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
 
 taskf "Link commands"
 link "${DOTFILES_PATH}/modules/claude/commands/babysit-mergify-ci.md" "${HOME}/.claude/commands/babysit-mergify-ci.md"
+link "${DOTFILES_PATH}/modules/claude/commands/finalize.md" "${HOME}/.claude/commands/finalize.md"
 link "${DOTFILES_PATH}/modules/claude/commands/watch-mergify-engine-deployment.md" "${HOME}/.claude/commands/watch-mergify-engine-deployment.md"

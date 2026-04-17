@@ -1,7 +1,7 @@
 {
   "folders": [
     {
-      "path": "/Users/remyduthu/dev/mergify/dashboard-ui/"
+      "path": "/Users/remyduthu/dev/mergify/monorepo/dashboard-ui/"
     }
   ],
   "settings": {
@@ -14,7 +14,6 @@
         }
       ]
     },
-
     // Lint.
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"

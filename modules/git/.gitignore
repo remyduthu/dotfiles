@@ -12,3 +12,5 @@ Thumbs.db
 
 .claude/settings.local.json
 .worktrees
+
+node_modules

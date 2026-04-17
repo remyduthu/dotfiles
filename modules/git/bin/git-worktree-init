@@ -23,6 +23,9 @@ setup_worktree() {
     # Create the worktree if it doesn't exist.
     if [ ! -d "${worktree_path}" ]; then
         git worktree add "${worktree_path}" "${worktree_name}"
+    else
+        # Switch the worktree back to its dedicated branch.
+        git -C "${worktree_path}" checkout --quiet "${worktree_name}"
     fi
 }
 
