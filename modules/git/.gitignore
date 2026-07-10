@@ -11,6 +11,12 @@ Thumbs.db
 .Trashes
 
 .claude/settings.local.json
+settings.local.json
 .worktrees
 
 node_modules
+.vitest-attachments
+__screenshots__
+docs/superpowers/
+
+**/.claude/settings.local.json
