@@ -1,23 +1,39 @@
 {
   "folders": [
     {
-      "path": "/Users/remyduthu/dev/mergify/monorepo/dashboard-ui/"
+      "path": "/Users/remyduthu/dev/mergify/monorepo/dashboard/"
     }
   ],
   "settings": {
-    // Format.
-    "editor.formatOnSave": false,
-    "emeraldwalk.runonsave": {
-      "commands": [
-        {
-          "cmd": "npm run format"
-        }
-      ]
+    // Format and organize imports with Biome to match CI's `format:check`.
+    "editor.formatOnSave": true,
+    "[javascript]": {
+      "editor.defaultFormatter": "biomejs.biome"
     },
-    // Lint.
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[css]": {
+      "editor.defaultFormatter": "biomejs.biome"
+    },
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      // Apply Oxlint's safe fixes on save so lint violations never reach CI's `lint` job.
+      "source.fixAll.oxc": "explicit",
+      "source.organizeImports.biome": "explicit"
     },
-    "eslint.enable": true
+    // Lint with Oxlint to match CI's `lint`; ESLint is not run in CI, so silence it here.
+    "eslint.enable": false
   }
 }
