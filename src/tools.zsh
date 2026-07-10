@@ -7,9 +7,10 @@ autoload -Uz colors; colors
 # Create a symbolik link
 function link() {
   # -f    Overwrite any existing target
+  # -h    Replace a symlink-to-directory instead of dereferencing into it
   # -s    Create a symbolic link (instead of a hard link)
   # -v    Be verbose
-  ln -fsv "${@}"
+  ln -fshv "${@}"
 }
 
 # Print a formatted task message
