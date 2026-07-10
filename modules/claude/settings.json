@@ -24,15 +24,13 @@
       "Bash(uv *)",
       "Bash(uv run poe test *)",
       "Edit",
-      "mcp__linear__get_*",
-      "mcp__linear__list_*",
-      "mcp__linear__search_*",
       "Read",
       "WebFetch"
     ],
     "ask": [
       "Bash(git push *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "SessionStart": [
@@ -50,8 +48,28 @@
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "feature-dev@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "mergify-internal@mergify-internal": true,
+    "skill-creator@claude-plugins-official": true
   },
-  "defaultMode": "plan",
+  "extraKnownMarketplaces": {
+    "mergify-internal": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/remyduthu/dev/mergify/skills"
+      }
+    }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "i=$(cat); d=$(echo \"$i\" | jq -r '.cwd' | sed \"s|^$HOME|~|\"); n=$(echo \"$i\" | jq -r '.session_name // empty'); printf '\\033[36m%s\\033[0m%s\\n' \"$d\" \"${n:+ · $n}\""
+  },
+  "effortLevel": "xhigh",
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "theme": "auto",
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
   "disableBypassPermissionsMode": "disable"
 }
