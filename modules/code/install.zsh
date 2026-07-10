@@ -37,6 +37,7 @@ extensions=(
   ms-python.vscode-python-envs
   ms-vsliveshare.vsliveshare
   mvllow.rose-pine
+  oxc.oxc-vscode
   redhat.vscode-xml
   redhat.vscode-yaml
   tamasfe.even-better-toml
