@@ -1,22 +1,24 @@
 ---
 name: ship
 description: >-
-  End-to-end PR shipping workflow, mergify-only. The input is usually a Linear issue
+  End-to-end feature shipping workflow, mergify-only. The input is usually a Linear issue
   ID (e.g. MRGFY-1234) — fetched to drive the branch name, commit footer, and context
   — or a free description of the change. Preflight the tooling, create a gitignored
-  worktree on a new branch, format/lint, commit by concern, review with /code-review
-  max, run affected tests, push the stack, open or update the PRs, then
-  report the shipped PRs with their CI status. Run when I invoke /ship,
-  say ship it / ship the changes, or ask to worktree + commit + push the stack.
+  worktree on a new branch, implement the change with its tests if it isn't written yet,
+  start the dashboard server, format/lint, commit by concern, review with /code-review
+  max, run affected tests, push each stack, open or update the PRs, then report them
+  with their CI status. Works from an unimplemented issue as well as from a dirty tree.
+  Invoke explicitly with /ship — it never runs on its own, because it pushes real PRs.
 disable-model-invocation: true
 argument-hint: "[MRGFY-1234 | description]"
-allowed-tools: Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, mcp__linear-server__get_issue
+allowed-tools: Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, ToolSearch, mcp__linear-server__get_issue
 ---
 
 # Ship
 
-Take the current changes from working tree to reviewed, pushed PRs — end to end,
-using **mergify tooling only**.
+Take a change from wherever it currently is — an unimplemented Linear issue, a rough
+draft, a dirty working tree — to reviewed, pushed PRs, end to end, using **mergify
+tooling only**.
 
 ## How to run this
 
@@ -71,9 +73,12 @@ command -v mergify >/dev/null || echo "✗ mergify CLI missing — install it be
 
 Then confirm three things and stop early if any is off:
 
-- **Something to ship.** If the source checkout is clean, the target branch doesn't
-  exist, and there's no worktree to resume, there's nothing to ship — say so and
-  stop rather than opening an empty stack.
+- **Something to ship.** A clean checkout is *not* "nothing to ship". If the input
+  names a Linear issue or describes a change, the code simply isn't written yet — that's
+  Step 4's job, so carry on. Shipping an unimplemented issue is a normal run, not an
+  error. Stop only when there is genuinely nothing to find: no input, a clean checkout
+  (untracked drafts count as work), no target branch, and no worktree to resume. Say so
+  then, rather than opening an empty stack.
 - **Interpret the input (`$ARGUMENTS`)** — usually a Linear issue ID, sometimes a
   description, sometimes empty:
   - **Linear issue** — a `MRGFY-1234` (any `ABC-123`) identifier or a
@@ -81,9 +86,9 @@ Then confirm three things and stop early if any is off:
     with the Linear MCP `get_issue` tool (load it via ToolSearch if the Linear tools
     aren't already available). Use the issue to: name the branch `mrgfy-1234-<short-slug>`
     (a few meaningful kebab-case words from the title, not the whole title); carry
-    `MRGFY-1234` as the reference footer for Step 5; and frame the work — the
+    `MRGFY-1234` as the reference footer for Step 6; and frame the work — the
     title/description guide how to split commits and write messages, and the
-    `repo:`/`area:` labels hint which area's tooling applies (Steps 4/7).
+    `repo:`/`area:` labels hint which area's tooling applies (Steps 5/8).
 
     **Challenge the plan — don't inherit it.** A Linear issue is written before the work
     is understood and drifts as reality lands, so its proposed steps are often stale,
@@ -101,10 +106,12 @@ Then confirm three things and stop early if any is off:
 
   Carry the result as `<branch>` through the rest.
 - **Commit-msg hook.** Warn now if it's absent, so commits get their `Change-Id`
-  (Step 5 covers the fix); the hook lives on the shared common `.git`:
+  (Step 6 covers the fix); the hook lives on the shared common `.git`:
 
   ```bash
-  HOOK="$(git -C "$ROOT" rev-parse --git-common-dir)/hooks/commit-msg"
+  # --path-format=absolute is load-bearing: the bare form is relative to $ROOT, so it
+  # would resolve against whatever directory this shell happens to sit in.
+  HOOK="$(git -C "$ROOT" rev-parse --path-format=absolute --git-common-dir)/hooks/commit-msg"
   [ -x "$HOOK" ] || echo "⚠ commit-msg hook missing — Change-Ids won't be generated; install it before committing."
   ```
 
@@ -125,43 +132,75 @@ create the worktree off fresh `origin/main` (AGENTS.md), so neither a stale loca
 if [ -d "$WT" ]; then
   cd "$WT"                                   # resume — worktree already exists
 else
-  # .claude/worktrees/ is Claude Code's managed, already-ignored dir; ensure it's
-  # excluded even in a repo not yet set up for it, without touching tracked .gitignore.
-  EXCLUDE="$(git -C "$ROOT" rev-parse --git-common-dir)/info/exclude"
+  # Keep the sibling worktrees out of $ROOT's status without touching tracked
+  # .gitignore. Not already ignored anywhere, and it matters: unexcluded, every other
+  # session's worktree reads as untracked work and trips the stash guard below.
+  EXCLUDE="$(git -C "$ROOT" rev-parse --path-format=absolute --git-common-dir)/info/exclude"
   grep -qxF '**/.claude/worktrees/' "$EXCLUDE" || echo '**/.claude/worktrees/' >> "$EXCLUDE"
 
   if git -C "$ROOT" show-ref --verify --quiet "refs/heads/<branch>"; then
     git -C "$ROOT" worktree add "$WT" <branch>        # reuse an existing branch
   else
-    git -C "$ROOT" fetch origin main
+    git -C "$ROOT" fetch origin main || exit 1   # unguarded, a failed fetch bases the stack on stale code.
     git -C "$ROOT" worktree add "$WT" -b <branch> origin/main
   fi
   cd "$WT"
 
   # Move uncommitted work from the source checkout into the worktree, if any.
-  # Guarded so a clean tree doesn't pop an unrelated stash.
-  if ! git -C "$ROOT" diff --quiet || ! git -C "$ROOT" diff --cached --quiet; then
-    git -C "$ROOT" stash push -u -m "ship-<branch>" && git stash pop
+  # Guarded so a clean tree doesn't stash at all. --porcelain is what sees untracked
+  # drafts; `git diff` alone reports them as clean and strands them.
+  if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
+    git -C "$ROOT" stash push -u -m "ship-<branch>" || exit 1
+    # The stash stack is shared across every worktree, so concurrent sessions push onto
+    # it too. Pop ours by label: a bare `git stash pop` takes whatever is on top, which
+    # is how one session's uncommitted work silently lands on another session's branch.
+    REF="$(git -C "$ROOT" stash list --format='%gd %gs' | grep -F 'ship-<branch>' | head -1 | cut -d' ' -f1)"
+    [ -n "$REF" ] && git stash pop "$REF"
   fi
 fi
 ```
 
-## Step 3 — Dashboard server (only if the change touches `dashboard/`)
+## Step 3 — Dashboard server (only if the change touches, or will touch, `dashboard/`)
 
-As soon as the worktree exists — before commit/review — start the dev server so I
-can follow changes live. `.env.development.local` is gitignored, so copy it from the
-source checkout. `dashboard/` is its own pnpm workspace (`start` runs Vite), so run
-from there:
+Judge that from the issue's `repo:`/`area:` labels or your Step 4 plan — not from the
+diff. On an unimplemented issue there is no diff to read yet, and skipping on that basis
+would leave the server down through Step 4, which is exactly when I want to watch it.
+
+Start it as soon as the worktree exists, before commit/review, so I can follow changes
+live. `.env.development.local` is gitignored, so copy it from the source checkout;
+`dashboard/` is its own pnpm workspace (`start` runs Vite), so run from there:
 
 ```bash
-cp "$ROOT/dashboard/.env.development.local" "$WT/dashboard/.env.development.local"
+ENV="$ROOT/dashboard/.env.development.local"
+[ -f "$ENV" ] && cp "$ENV" "$WT/dashboard/.env.development.local"   # absent is fine — say so and carry on.
 cd "$WT/dashboard" && pnpm start   # background; report the URL
 ```
 
-## Step 4 — Format & lint (before committing)
+## Step 4 — Implement (only if the change isn't written yet)
+
+Skip this only when the tree already holds the **complete** change. A rough draft
+cleared Step 1's "something to ship" check without being finished — finish it here,
+rather than reading its presence as "already implemented" and shipping it half-built.
+
+The worktree is where the code gets *written*, not just where it gets carried. Read the
+code first, then judge the implementation against the code as it stands now — Step 1's
+"challenge the plan" applies here too: where the issue and the code disagree, or a real
+decision is still open, stop and ask with your recommendation instead of assuming past
+it.
+
+Build the smallest useful slice first and say what you're intentionally **not**
+building (working principles above). Anything past that slice — parallelism, CLI args, a
+new abstraction — waits for my approval.
+
+**New behavior ships with its tests.** They're part of the smallest useful slice, not an
+addition to it, and they go in the same commit as the code they cover — a commit whose
+tests live in a different PR isn't independently deployable (CLAUDE.md). Step 8 can only
+run what you write here; it has no way to fail a test that was never written.
+
+## Step 5 — Format & lint (before committing)
 
 Settle style *now*, not after review. A clean, formatted diff means `/code-review`
-(Step 6) spends its attention on substance instead of whitespace, and your commits
+(Step 7) spends its attention on substance instead of whitespace, and your commits
 read right the first time instead of needing a formatting fold later. Adapt to the
 area you touched:
 
@@ -172,12 +211,12 @@ area you touched:
 
 Fix anything the tools can't auto-fix before committing.
 
-## Step 5 — Commit by concern
+## Step 6 — Commit by concern
 
 From the worktree, split the changes into logical, independently-deployable commits
-— each is a PR in the stack. Concerns with no dependency between them belong in
-**separate independent stacks**, not one linear chain (CLAUDE.md coupling rule).
-Separate concerns with `git add -p` / path-scoped `git add`.
+— each is a PR in the stack. Separate concerns with `git add -p` / path-scoped `git add`.
+Commit every concern here first, whatever shape the stacks end up taking: that's what
+earns each one its `Change-Id` and gets it somewhere recoverable.
 
 Commit messages follow CLAUDE.md (Conventional Commits, uppercase, imperative,
 WHY-focused, alphabetical footer). When Step 1 resolved a Linear issue, that's the
@@ -190,11 +229,34 @@ New commits get their
 missing `Change-Id`, install the hook and re-commit, so re-ships match PRs
 deterministically.
 
-## Step 6 — Review with /code-review max
+### Independent concerns get their own stack
+
+Chaining unrelated work into one branch couples PRs that needn't be: the second can't
+merge until the first does (CLAUDE.md coupling rule). So once the commits exist, give
+each concern that doesn't depend on the ones before it its own branch off fresh
+`origin/main`:
+
+```bash
+WT2="$ROOT/.claude/worktrees/<branch-2>"
+git -C "$ROOT" worktree add "$WT2" -b <branch-2> origin/main
+git -C "$WT2" cherry-pick <sha> || exit 1   # the message, and its Change-Id, come across
+git -C "$WT" rebase --onto <sha>~1 <sha>    # only now safe to drop it from the original
+```
+
+Cherry-pick before dropping, never the reverse, and keep the `|| exit 1` — a failed
+pick followed by a drop leaves the commit on no branch at all. A conflict here means
+the concerns weren't independent after all, and you've learned that having changed
+nothing in `$WT`. Say so and leave them in one stack rather than forcing the split.
+
+Track each branch/worktree pair — Step 9 pushes them separately, and Step 10 reports
+the count.
+
+## Step 7 — Review with /code-review max
 
 Invoke `/code-review max --fix`. It reviews the branch-vs-base **committed** diff
-(hence commit first) and applies fixes to the working tree. Fold each fix into the
-commit it belongs to; skip this if there are no findings:
+(hence commit first) and applies fixes to the working tree. It only sees the branch you
+are standing on, so run it once per worktree Step 6 left you with. Fold each fix into
+the commit it belongs to; skip this if there are no findings:
 
 - Single commit: `git add -A && git commit --amend --no-edit` (use `-A`, not `-u`,
   so a new file the review adds — e.g. a test — isn't silently dropped).
@@ -204,11 +266,13 @@ commit it belongs to; skip this if there are no findings:
   stack, and it preserves every commit's `Change-Id`. If the rebase conflicts, stop
   and surface it — don't guess a resolution.
 
-Apply only high-confidence cleanups and bug fixes. If a finding would add
-abstraction, parallelism, or CLI args — or is otherwise risky — do **not** auto-apply:
-propose the smallest diff, list what you're not building, and wait for my approval.
+Keep only high-confidence cleanups and bug fixes. By the time you read the findings
+`--fix` has already applied all of them, so "don't apply that one" isn't on the menu —
+**revert** the hunk instead, then propose it separately: smallest diff, what you're not
+building, and wait for my approval. That covers any finding that adds abstraction,
+parallelism, or CLI args, or is otherwise risky.
 
-## Step 7 — Test gate: affected tests
+## Step 8 — Test gate: affected tests
 
 Each commit must be green before it becomes a PR — that's what "independently
 deployable" means (CLAUDE.md). Run the tests relevant to your change, not the whole
@@ -218,26 +282,35 @@ suite:
   once instead of parking in watch mode (which would hang).
 - Engine: `cd "$WT/engine" && uv run poe test <path>` — scope to the touched path.
 
-If Step 6 folded code changes, re-run format/lint first (cheap) so the fold didn't
-reintroduce style drift, then the tests. Fix any failure and re-fold it into the
-right commit (Step 6). Don't push red.
+A run that collects nothing is a red flag, not a pass. If the change added behavior and
+no test exercises it, the gate didn't hold — go back to Step 4 and write the test.
 
-## Step 8 — Push the stack (mergify)
+Gate every worktree Step 6 left you with, not just `$WT`. A stack split off precisely
+because it stands alone is the last one that should reach a PR untested.
+
+If Step 7 folded code changes, re-run format/lint first (cheap) so the fold didn't
+reintroduce style drift, then the tests. Fix any failure and re-fold it into the
+right commit (Step 7). Don't push red.
+
+## Step 9 — Push each stack (mergify)
+
+Independent stacks are independent pushes — there's no combined command. Run this once
+per worktree Step 6 left you with, from inside that worktree:
 
 ```bash
-cd "$WT"
+cd "$WT"                 # then again from "$WT2", … — one push per stack
 mergify stack push --dry-run
 ```
 
-If the dry run would update PRs from earlier/unrelated commits, ask before
-proceeding (skip this check on a brand-new branch with no existing PRs). Then
-`mergify stack push` — it opens the PRs (first ship) or updates them (re-ship).
-Capture the PR numbers/URLs it prints; you'll need them in the steps that follow. If
-the push is rejected, surface the exact error and stop — never fall back to `git push`.
+If a dry run would update PRs from earlier/unrelated commits, ask before proceeding
+(skip this check on a brand-new branch with no existing PRs). Then `mergify stack push`
+— it opens the PRs (first ship) or updates them (re-ship). Capture the PR numbers/URLs
+each push prints; you'll need them in the steps that follow. If a push is rejected,
+surface the exact error and stop — never fall back to `git push`.
 
-## Step 9 — CI + final report
+## Step 10 — CI + final report
 
-Don't leave me to hunt for what happened. From Step 8 you have the PR numbers; take
+Don't leave me to hunt for what happened. From Step 9 you have the PR numbers; take
 one CI snapshot per PR rather than watching a loop:
 
 ```bash
