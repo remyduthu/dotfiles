@@ -32,6 +32,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -44,6 +45,10 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "i=$(cat); d=$(echo \"$i\" | jq -r '.cwd' | sed \"s|^$HOME|~|\"); t=$(echo \"$i\" | jq -r '.context_window.total_input_tokens // empty'); s=$(echo \"$i\" | jq -r '.context_window.context_window_size // empty'); cs=\"\"; [ -n \"$t\" ] && [ -n \"$s\" ] && u=$(awk -v t=\"$t\" -v s=\"$s\" 'BEGIN{p=(s>0)?t/s*100:0; printf \"%.1fk (%.1f%%)\", t/1000, p}') && cs=$(printf ' · \\033[33m%s\\033[0m' \"$u\"); printf '\\033[36m%s\\033[0m%s\\n' \"$d\" \"$cs\""
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
@@ -51,7 +56,8 @@
     "feature-dev@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "mergify-internal@mergify-internal": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "mattpocock-skills@mattpocock": true
   },
   "extraKnownMarketplaces": {
     "mergify-internal": {
@@ -59,11 +65,13 @@
         "source": "directory",
         "path": "/Users/remyduthu/dev/mergify/skills"
       }
+    },
+    "mattpocock": {
+      "source": {
+        "source": "github",
+        "repo": "mattpocock/skills"
+      }
     }
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "i=$(cat); d=$(echo \"$i\" | jq -r '.cwd' | sed \"s|^$HOME|~|\"); n=$(echo \"$i\" | jq -r '.session_name // empty'); printf '\\033[36m%s\\033[0m%s\\n' \"$d\" \"${n:+ · $n}\""
   },
   "effortLevel": "xhigh",
   "tui": "fullscreen",
