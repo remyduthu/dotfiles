@@ -3,8 +3,8 @@ name: ship
 description: >-
   End-to-end feature shipping workflow, mergify-only. The input is usually a Linear issue
   ID (e.g. MRGFY-1234) — fetched to drive the branch name, commit footer, and context
-  — or a free description of the change. Preflight the tooling, create a gitignored
-  worktree on a new branch, implement the change with its tests if it isn't written yet,
+  — or a free description of the change. Preflight the tooling, grill the plan, create a
+  gitignored worktree on a new branch, implement test-first if it isn't written yet,
   start the dashboard server, format/lint, commit by concern, review with /code-review
   max, run affected tests, push each stack, open or update the PRs, then report them
   with their CI status. Works from an unimplemented issue as well as from a dirty tree.
@@ -71,7 +71,7 @@ PRs. Two habits keep it safe:
   and `cd "$WT"` before `mergify`/`pnpm`. Running a commit or push from the source
   checkout would land it on the wrong branch — the worst failure this skill can cause.
 
-## Step 1 — Preflight
+## Step 1 — Preflight & grill
 
 Cheaper to fail here than halfway up a stack.
 
@@ -103,10 +103,8 @@ either is off:
     **Challenge the plan — don't inherit it.** A Linear issue is written before the work
     is understood and drifts as reality lands, so its proposed steps are often stale,
     partial, or wrong by the time you ship. Read it for *intent*, then judge the best
-    implementation against the code as it is now — not against the plan's word. Where the
-    plan and the code disagree, or the plan leaves a real decision open or half-specified,
-    stop and ask: surface the options with your recommendation and let me choose. Assuming
-    your way past a fork the issue got wrong is how a ship ships the wrong thing.
+    implementation against the code as it is now — not against the plan's word. The grill
+    below is where that judgment gets tested.
 
     If Linear is unreachable, fall back to branch `mrgfy-1234` and a `References: MRGFY-1234`
     footer, and say so — a fetch hiccup shouldn't block the ship.
@@ -115,6 +113,20 @@ either is off:
   - **Empty** — derive a short kebab-case branch from the change itself.
 
   Carry the result as `<branch>` through the rest.
+
+### Grill me before any code
+
+Whenever code remains to be written (Step 4 will run), invoke `/mattpocock-skills:grilling`
+now and let it run to the end: one question at a time, every decision put to me, every
+lookable-up fact looked up instead of asked. Read the relevant code first so the questions
+are about this codebase, not about the issue's prose.
+
+Settle the **seams** under test here too — Step 4 writes tests first, and TDD only starts
+once we agree which public boundaries they sit at.
+
+This is a hard gate: the plan you ship is the one that survives the grill, so create no
+worktree and write no code until I confirm we have a shared understanding. A change already
+complete in the tree skips it, alongside Step 4.
 
 ## Step 2 — Worktree
 
@@ -150,20 +162,19 @@ Skip this only when the tree already holds the **complete** change. A rough draf
 cleared Step 1's "something to ship" check without being finished — finish it here,
 rather than reading its presence as "already implemented" and shipping it half-built.
 
-The worktree is where the code gets *written*, not just where it gets carried. Read the
-code first, then judge the implementation against the code as it stands now — Step 1's
-"challenge the plan" applies here too: where the issue and the code disagree, or a real
-decision is still open, stop and ask with your recommendation instead of assuming past
-it.
+The worktree is where the code gets *written*, not just where it gets carried. Build the
+smallest useful slice first and say what you're intentionally **not** building (working
+principles above). Anything past that slice — parallelism, CLI args, a new abstraction —
+waits for my approval. Where the grill's plan and the code disagree once you're in it, or a
+decision it left open resurfaces, stop and ask rather than assuming past it.
 
-Build the smallest useful slice first and say what you're intentionally **not**
-building (working principles above). Anything past that slice — parallelism, CLI args, a
-new abstraction — waits for my approval.
+**Work test-first**, against the seams Step 1 agreed: invoke `/mattpocock-skills:tdd` and
+run its red → green loop, one vertical slice at a time. Red before green is what proves the
+test can fail; a test written after the code only proves the code does what it does.
 
-**New behavior ships with its tests.** They're part of the smallest useful slice, not an
-addition to it, and they go in the same commit as the code they cover — a commit whose
-tests live in a different PR isn't independently deployable (CLAUDE.md). Step 8 can only
-run what you write here; it has no way to fail a test that was never written.
+Tests go in the same commit as the code they cover — a commit whose tests live in a
+different PR isn't independently deployable (CLAUDE.md). Step 8 can only run what you write
+here; it has no way to fail a test that was never written.
 
 ## Step 5 — Format & lint (before committing)
 
