@@ -27,7 +27,7 @@
 	<key>AllowClipboardAccess</key>
 	<true/>
 	<key>CompactMinimalTabBarHeight</key>
-	<real>38</real>
+	<real>44</real>
 	<key>Custom Color Presets</key>
 	<dict>
 		<key>Dracula</key>
@@ -1279,7 +1279,7 @@
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>LeftTabBarWidth</key>
-	<real>320</real>
+	<real>391</real>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C</key>
 	<true/>
 	<key>NeverWarnAboutShortLivedSessions_5A985DB7-36BE-419F-8345-DB577396F34C_selection</key>
@@ -1294,7 +1294,9 @@
 			<key>Ambiguous Double Width</key>
 			<false/>
 			<key>Animate Movement</key>
-			<true/>
+			<false/>
+			<key>Animate Movement Only in Interactive Apps</key>
+			<false/>
 			<key>Ansi 0 Color</key>
 			<dict>
 				<key>Blue Component</key>
