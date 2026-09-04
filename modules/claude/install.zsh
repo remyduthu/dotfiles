@@ -13,5 +13,5 @@ link "${DOTFILES_PATH}/modules/claude/settings.json" "${HOME}/.claude/settings.j
 link "${DOTFILES_PATH}/modules/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
 
 taskf "Link skills"
-link "${DOTFILES_PATH}/modules/claude/skills/ship" "${HOME}/.claude/skills/ship"
+link "${DOTFILES_PATH}/modules/claude/skills/ship-issue" "${HOME}/.claude/skills/ship-issue"
 link "${DOTFILES_PATH}/modules/claude/skills/address-threads" "${HOME}/.claude/skills/address-threads"
