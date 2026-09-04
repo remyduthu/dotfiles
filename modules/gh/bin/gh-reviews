@@ -14,10 +14,12 @@ if [ "${1:-}" = "--browse" ]; then
   open_in_browser=true
 fi
 
-# Fetch open PRs requesting the user's review, excluding drafts, conflicts,
-# and unresolved review threads. The `reviews` subquery fetches the user's last
-# review to filter out already-approved PRs.
-search_query='base:main draft:false is:open is:pr -label:conflict -label:"review threads unresolved" review-requested:@me sort:updated-desc'
+# Fetch open PRs requesting the user's review, excluding drafts. The `reviews`
+# subquery fetches the user's last review to filter out already-approved PRs,
+# and `labels` lets the client exclude conflicts and unresolved review threads.
+# The search API's label filter is unreliable and silently drops matching PRs,
+# so that filtering happens client-side below instead.
+search_query='base:main draft:false is:open is:pr review-requested:@me sort:updated-desc'
 author_login=$(gh api user --jq .login)
 
 # shellcheck disable=SC2016
@@ -31,6 +33,9 @@ graphql_query='
           url
           author { login }
           repository { nameWithOwner }
+          labels(first: 20) {
+            nodes { name }
+          }
           reviews(author: $author_login, last: 1, states: [APPROVED]) {
             totalCount
           }
@@ -40,11 +45,16 @@ graphql_query='
   }
 '
 
-# Filter out approved PRs, then group by repository.
+# Filter out approved PRs and those labeled as conflicting or with unresolved
+# review threads, then group by repository.
 #
 # shellcheck disable=SC2016
 jq_filter='
-  [.data.search.nodes[] | select(.reviews.totalCount == 0)]
+  [
+    .data.search.nodes[]
+    | select(.reviews.totalCount == 0)
+    | select([.labels.nodes[].name] | any(. == "conflict" or . == "review threads unresolved") | not)
+  ]
   | group_by(.repository.nameWithOwner)
   | .[]
   | (.[0].repository.nameWithOwner) as $repository
