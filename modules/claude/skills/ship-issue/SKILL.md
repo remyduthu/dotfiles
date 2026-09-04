@@ -4,7 +4,7 @@ description: >-
   Ship one Linear issue to reviewed, pushed PRs. Use when shipping a Linear issue
   (user names it or /ship-idea hands it over).
 argument-hint: "MRGFY-1234"
-allowed-tools: Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, ToolSearch, mcp__linear-server__get_issue, mcp__linear-server__save_comment
+allowed-tools: Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, ToolSearch, Artifact, mcp__linear-server__get_issue, mcp__linear-server__save_comment
 ---
 
 # Ship an issue
