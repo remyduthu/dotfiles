@@ -15,7 +15,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-DEFAULT_ROOT = Path.home() / "dev" / "mergify" / "monorepo"
+# The session ships whichever checkout it was started in, so a batch spawned
+# by `ship-issues --repository <path>` lands in that repository.
+DEFAULT_ROOT = Path.cwd()
 EXCLUDE_PATTERN = "**/.claude/worktrees/"
 
 
