@@ -26,6 +26,9 @@ def run(arguments, cwd=None, check=True, capture=False, env=None):
         cwd=cwd,
         text=True,
         capture_output=capture,
+        # Subcommands that print a value print it alone on stdout; a child's
+        # chatter there would be read as part of that value.
+        stdout=None if capture else sys.stderr,
         env=env,
     )
     if check and result.returncode != 0:
@@ -82,6 +85,60 @@ def preflight(arguments):
         )
 
 
+# --- branch ------------------------------------------------------------------
+
+# Filler words carry no meaning in a branch name and crowd out the words that do.
+FILLER = frozenset(
+    "a an the is are was were be been of to for in on at when that this and or"
+    " not never with from by it its as".split()
+)
+BRANCH_WORDS = 4
+
+
+def branch(arguments):
+    # Linear titles often open with a Conventional Commit prefix ("fix:",
+    # "feat(engine):"); it says nothing the branch name needs.
+    title = re.sub(r"^\s*\w+(\([^)]*\))?:\s*", "", arguments.title)
+    words = [word for word in re.findall(r"[a-z0-9]+", title.lower()) if word not in FILLER]
+    slug = "-".join(words[:BRANCH_WORDS])
+    print(f"{arguments.issue.lower()}{'-' + slug if slug else ''}")
+
+
+# --- review-level ------------------------------------------------------------
+
+# A stack, or a diff past this size, carries more than one reviewer's worth of
+# consequence; anything smaller is served by the cheaper pass.
+MAX_REVIEW_LINES = 150
+
+
+def review_level(arguments):
+    wt = arguments.worktree
+    merge_base = git_output(wt, "merge-base", "HEAD", "origin/main")
+    commits = len(git_output(wt, "rev-list", f"{merge_base}..HEAD").splitlines())
+    if commits == 0:
+        fail("no commits ahead of origin/main — commit before reviewing.")
+
+    numstat = git_output(wt, "diff", "--numstat", f"{merge_base}..HEAD")
+    lines = sum(
+        int(count)
+        for row in numstat.splitlines()
+        for count in row.split("\t")[:2]
+        # A binary file reports "-"; it has no line count to add.
+        if count.isdigit()
+    )
+
+    if commits > 1:
+        level, reason = "max", f"{commits} commits in the stack"
+    elif lines >= MAX_REVIEW_LINES:
+        level, reason = "max", f"{lines} changed lines"
+    else:
+        level, reason = "high", f"1 commit, {lines} changed lines"
+
+    # The level alone on stdout, so the skill can pass it straight to /code-review.
+    print(f"✓ review level: {reason}", file=sys.stderr)
+    print(level)
+
+
 # --- worktree ----------------------------------------------------------------
 
 
@@ -89,7 +146,8 @@ def worktree(arguments):
     root, branch = arguments.root, arguments.branch
     path = worktree_path(root, branch)
     if path.is_dir():
-        print(f"✓ resumed existing worktree: {path}")
+        print(f"✓ resumed existing worktree: {path}", file=sys.stderr)
+        print(path)
         return
 
     # Keep sibling worktrees out of the checkout's status without touching the
@@ -144,7 +202,7 @@ def worktree(arguments):
                 f"stash pop conflicted — the work is still in {reference};"
                 " resolve by hand, don't drop the stash."
             )
-        print("✓ migrated uncommitted work from the source checkout")
+        print("✓ migrated uncommitted work from the source checkout", file=sys.stderr)
 
     # Dashboard env is gitignored, so a fresh worktree never has it; copying is
     # harmless when the change won't touch the dashboard. After the stash
@@ -152,9 +210,11 @@ def worktree(arguments):
     env_file = root / "dashboard" / ".env.development.local"
     if env_file.is_file() and (path / "dashboard").is_dir():
         shutil.copy(env_file, path / "dashboard" / ".env.development.local")
-        print("✓ copied dashboard/.env.development.local")
+        print("✓ copied dashboard/.env.development.local", file=sys.stderr)
 
-    print(f"✓ worktree ready: {path}")
+    # The path alone on stdout, so the skill can capture it instead of rebuilding it.
+    print(f"✓ worktree ready: {path}", file=sys.stderr)
+    print(path)
 
 
 # --- lint --------------------------------------------------------------------
@@ -355,7 +415,14 @@ def main():
     sub = add("preflight", preflight, help="Check checkout, mergify CLI, commit-msg hook.")
     sub.add_argument("--root", type=Path, default=DEFAULT_ROOT)
 
-    sub = add("worktree", worktree, help="Create or resume the ship worktree off fresh origin/main.")
+    sub = add("branch", branch, help="Print the branch name for a Linear issue.")
+    sub.add_argument("--issue", required=True)
+    sub.add_argument("--title", required=True)
+
+    sub = add("review-level", review_level, help="Print the /code-review level the stack warrants.")
+    sub.add_argument("--worktree", type=Path, required=True)
+
+    sub = add("worktree", worktree, help="Create or resume the ship worktree; prints its path.")
     sub.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     sub.add_argument("--branch", required=True)
 
