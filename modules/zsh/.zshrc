@@ -193,7 +193,7 @@ compdef _kjlogs kjlogs
 # Exports
 #
 
-export EDITOR="nvim"
+export EDITOR="code --wait"
 
 # https://github.com/drduh/macOS-Security-and-Privacy-Guide#homebrew
 export HOMEBREW_CASK_OPTS="--require-sha"
