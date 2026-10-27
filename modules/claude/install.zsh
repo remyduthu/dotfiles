@@ -18,3 +18,4 @@ link "${DOTFILES_PATH}/modules/claude/skills/ship-issues" "${HOME}/.claude/skill
 link "${DOTFILES_PATH}/modules/claude/skills/ship-idea" "${HOME}/.claude/skills/ship-idea"
 link "${DOTFILES_PATH}/modules/claude/skills/say" "${HOME}/.claude/skills/say"
 link "${DOTFILES_PATH}/modules/claude/skills/close-session" "${HOME}/.claude/skills/close-session"
+link "${DOTFILES_PATH}/modules/claude/skills/green" "${HOME}/.claude/skills/green"
