@@ -1,7 +1,7 @@
 {
+  "cleanupPeriodDays": 180,
   "permissions": {
     "allow": [
-      "Bash(.agents/skills/prod-sql-query/scripts/query-prod.sh *)",
       "Bash(* --help)",
       "Bash(* --version)",
       "Bash(cat *)",
@@ -12,8 +12,6 @@
       "Bash(gh pr view *)",
       "Bash(gh repo view *)",
       "Bash(gh run view *)",
-      "Bash(git -C /Users/remyduthu/dev/mergify/monorepo show *)",
-      "Bash(git -C /Users/remyduthu/dev/mergify/support/src/monorepo show *)",
       "Bash(git add *)",
       "Bash(git checkout *)",
       "Bash(git commit *)",
@@ -25,7 +23,6 @@
       "Bash(mergify *)",
       "Bash(npm *)",
       "Bash(uv *)",
-      "Bash(uv run poe test *)",
       "Edit",
       "Read",
       "WebFetch"
@@ -33,35 +30,21 @@
     "ask": [
       "Bash(git push *)"
     ],
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable"
   },
   "model": "opus[1m]",
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/remyduthu/.config/mergify-cli/claude-hooks/session-start.sh"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
-    "command": "i=$(cat); d=$(echo \"$i\" | jq -r '.cwd' | sed \"s|^$HOME|~|\"); t=$(echo \"$i\" | jq -r '.context_window.total_input_tokens // empty'); s=$(echo \"$i\" | jq -r '.context_window.context_window_size // empty'); cs=\"\"; [ -n \"$t\" ] && [ -n \"$s\" ] && u=$(awk -v t=\"$t\" -v s=\"$s\" 'BEGIN{p=(s>0)?t/s*100:0; printf \"%.1fk (%.1f%%)\", t/1000, p}') && cs=$(printf ' · \\033[33m%s\\033[0m' \"$u\"); printf '\\033[36m%s\\033[0m%s\\n' \"$d\" \"$cs\""
+    "command": "i=$(cat); d=$(echo \"$i\" | jq -r '.cwd' | sed \"s|^$HOME|~|\"); t=$(echo \"$i\" | jq -r '.context_window.total_input_tokens // empty'); s=$(echo \"$i\" | jq -r '.context_window.context_window_size // empty'); cs=\"\"; [ -n \"$t\" ] && [ -n \"$s\" ] && u=$(awk -v t=\"$t\" -v s=\"$s\" 'BEGIN{p=(s>0)?t/s*100:0; printf \"%.1fk (%.1f%%)\", t/1000, p}') && cs=$(printf ' · \\033[33m%s\\033[0m' \"$u\"); r=$(echo \"$i\" | jq -r '.rate_limits.five_hour.used_percentage // empty'); w=$(echo \"$i\" | jq -r '.rate_limits.seven_day.used_percentage // empty'); rl=\"\"; [ -n \"$r\" ] && rl=$(printf '%.0f%%/5h' \"$r\"); [ -n \"$w\" ] && rl=\"${rl:+$rl }$(printf '(%.0f%%/7d)' \"$w\")\"; [ -n \"$rl\" ] && rl=$(printf ' · \\033[35m%s\\033[0m' \"$rl\"); printf '\\033[36m%s\\033[0m%s%s\\n' \"$d\" \"$cs\" \"$rl\""
   },
   "enabledPlugins": {
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "mergify-internal@mergify-internal": true,
-    "skill-creator@claude-plugins-official": true,
     "mattpocock-skills@mattpocock": true,
-    "datadog@claude-plugins-official": true
+    "datadog@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true
   },
   "extraKnownMarketplaces": {
     "mergify-internal": {
@@ -75,34 +58,23 @@
         "source": "github",
         "repo": "mattpocock/skills"
       }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
+      }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "tap"
+  },
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "preferredNotifChannel": "notifications_disabled",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "autoMode": {
-    "allow": [
-      "$defaults",
-      "Bash(git -C src/monorepo/*:*)",
-      "Bash(git -C src/infrastructure/*:*)",
-      "Bash(git -C src/docs/*:*)",
-      "Bash(git -C src/browser-extension/*:*)",
-      "Bash(git -C src/alembic-git-revisions/*:*)"
-    ],
-    "soft_deny": [
-      "$defaults",
-      "Bash(gsutil rm:*) — Cloud Storage Mass Delete via gsutil is not separately covered by default labels; gsutil used 8× in this project",
-      "Bash(mergify freeze create:*) — production merge-freeze creation seen in CLAUDE.md workflow; treat as a soft block requiring explicit confirmation each time",
-      "Bash(gsutil rm:*) — in Mergifyio/support (Cloud Storage Mass Delete carve-in for the frequently-used `gsutil` CLI)",
-      "Bash(mergify freeze create:*) — in Mergifyio/support submodules (freezes affect production merge behavior; routine per CLAUDE.md but should stay reviewable)",
-      "Bash(mergify freeze create:*)",
-      "Bash(gsutil rm:*)",
-      "Bash(gcloud * delete:*)"
-    ]
-  },
-  "disableBypassPermissionsMode": "disable"
+  "skipAutoPermissionPrompt": true
 }
