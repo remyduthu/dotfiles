@@ -25,7 +25,7 @@ def main():
         "issues",
         nargs="+",
         metavar="ISSUE",
-        help='Session name, e.g. "MRGFY-1234 — Fix the thing".',
+        help='Session name, e.g. "ABC-123 — Fix the thing".',
     )
     arguments = parser.parse_args()
 
