@@ -70,11 +70,12 @@
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
-    "mode": "tap"
+    "mode": "hold"
   },
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "preferredNotifChannel": "notifications_disabled",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true
 }
