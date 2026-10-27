@@ -14,7 +14,6 @@ link "${DOTFILES_PATH}/modules/claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
 
 taskf "Link skills"
 link "${DOTFILES_PATH}/modules/claude/skills/ship-issue" "${HOME}/.claude/skills/ship-issue"
-link "${DOTFILES_PATH}/modules/claude/skills/pr-xray" "${HOME}/.claude/skills/pr-xray"
 link "${DOTFILES_PATH}/modules/claude/skills/ship-issues" "${HOME}/.claude/skills/ship-issues"
 link "${DOTFILES_PATH}/modules/claude/skills/ship-idea" "${HOME}/.claude/skills/ship-idea"
 link "${DOTFILES_PATH}/modules/claude/skills/close-session" "${HOME}/.claude/skills/close-session"
