@@ -106,7 +106,7 @@ POLL_SECONDS = 60
 
 
 def wait(arguments):
-    """Poll the PRs until their checks settle, then print where each one stands.
+    """Poll the PRs until their checks settle or one has a fix to make, then print where each one stands.
 
     The signal lines come from the unblocking skill's pr-state script, which reads every
     place feedback can land; this only decides when they are worth reading.
@@ -130,11 +130,12 @@ def wait(arguments):
             state["action"] != "done" and state["ci"] in ("pending", "none")
             for state in states
         )
-        if not settling or time.monotonic() >= deadline:
+        actions = {state["action"] for state in states}
+        # A fix ends in a push that outdates the checks still running, so waiting on them is wasted.
+        if "fix" in actions or not settling or time.monotonic() >= deadline:
             break
         time.sleep(POLL_SECONDS)
 
-    actions = {state["action"] for state in states}
     if "fix" in actions:
         verdict = "work"
     elif settling or "unknown" in actions:
