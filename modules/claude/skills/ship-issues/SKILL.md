@@ -75,6 +75,7 @@ Follow with `claude agents`; `claude attach <id>` answers one that shows `blocke
 
 A session working quietly for hours is the normal state rather than a hang. `blocked`
 means a **fork**; attach and answer it. A session idle from its first turn is stuck at
-workspace trust. Each session runs until its PRs are green.
+workspace trust. Each session runs until its PRs merge, then stops itself: one still
+listed is waiting on a merge or blocked.
 
 **Done when:** every spawned session appears in the summary with its id.

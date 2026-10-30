@@ -1,7 +1,7 @@
 ---
 name: ship-issue
 description: >-
-  Ship one Linear issue to green PRs. Use when the user asks to ship or implement a
+  Ship one Linear issue to landed PRs. Use when the user asks to ship or implement a
   Linear issue, or /ship-idea hands one over.
 argument-hint: "ABC-123"
 allowed-tools: Agent, Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, ToolSearch, Artifact, mcp__linear-server__get_issue, mcp__linear-server__save_comment
@@ -9,7 +9,7 @@ allowed-tools: Agent, Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite, Too
 
 # Ship an issue
 
-One Linear issue → PRs that are implemented, reviewed, pushed, open and **green**.
+One Linear issue → PRs that are implemented, reviewed, pushed, green and **landed**.
 
 The mechanical steps live in `scripts/ship-issue.py`, bundled next to this file. Below,
 `$SHIP` stands for `"<base directory of this skill>/scripts/ship-issue.py"` — the skill's
@@ -156,10 +156,9 @@ PR.
 
 **Done when:** every stack is pushed, every PR is open, and you hold its numbers.
 
-## Step 10 — Green
+## Step 10 — Land
 
-Invoke `/green` with the PR numbers, once per worktree.
+Invoke `/land` with every PR number.
 
-**Done when:** `/green` reports green and you have relayed its report, adding
-`Independent stacks: <count>`. That is where I come back in: green, open, and mine to
-merge.
+**Done when:** `/land` has relayed `/green`'s report, adding `Independent stacks: <count>`,
+and closed the session, or stopped on a fork.

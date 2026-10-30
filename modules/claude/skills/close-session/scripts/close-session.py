@@ -6,11 +6,14 @@
 
 `check` says whether a worktree or branch is safe to remove: everything in it is
 already on origin's default branch. `remove` removes only what `check` passes.
+`stop-background` stops this session when `claude --bg` started it.
 Which items belong to the session, and what to do with the rest, stays with the
 model in SKILL.md.
 """
 
 import argparse
+import json
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -154,9 +157,30 @@ def remove(arguments):
     return 0 if all_removed else 1
 
 
+def stop_background(arguments):
+    session = os.environ.get("CLAUDE_CODE_SESSION_ID")
+    agents = subprocess.run(["claude", "agents", "--json"], text=True, capture_output=True)
+    if agents.returncode != 0:
+        fail(f"claude agents --json failed: {agents.stderr.strip()}")
+    identifier = next(
+        (
+            agent["id"]
+            for agent in json.loads(agents.stdout)
+            if agent["sessionId"] == session and agent["kind"] == "background"
+        ),
+        None,
+    )
+    if identifier is None:
+        fail("not a background session: nothing to stop")
+    # Stopping ends this very process, so say so first.
+    print(f"✓ stopping background session {identifier}", flush=True)
+    return subprocess.run(["claude", "stop", identifier]).returncode
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(required=True)
+    subparsers.add_parser("stop-background").set_defaults(function=stop_background)
     for name, function in (("check", check), ("remove", remove)):
         subparser = subparsers.add_parser(name)
         subparser.add_argument("targets", nargs="+", help="worktree paths or branch names")

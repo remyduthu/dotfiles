@@ -3,7 +3,7 @@ name: green
 description: >-
   Take a pull request or stack to green: conflict-free, checks passing, review blockers
   cleared. Use when the user wants a PR or stack green or babysat through CI, or when
-  /ship-issue hands over its pushed PRs.
+  /land hands over its PRs.
 argument-hint: "[PR numbers; defaults to the stack checked out here]"
 allowed-tools: Agent, Bash, Read, Edit, Write, Grep, Glob, Skill, TodoWrite
 ---

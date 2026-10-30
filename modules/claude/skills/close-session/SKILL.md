@@ -1,7 +1,8 @@
 ---
 name: close-session
-description: Clean up this session's footprint so the user can close it.
-disable-model-invocation: true
+description: >-
+  Clean up this session's footprint, then archive the session. Use when the user asks to
+  close this session, or /land hands over once its PRs merged.
 ---
 
 # Close the session
@@ -16,6 +17,7 @@ run it by that full path every time.
 target. Safe means everything in it is already on origin's default branch, squash merges
 included. `close-session.py remove` takes the same targets and removes only the safe ones. Branch
 names resolve against the current directory; pass `--repository <checkout>` for others.
+`close-session.py stop-background` stops this session when `claude --bg` started it.
 
 ## Steps
 
@@ -38,3 +40,8 @@ names resolve against the current directory; pass `--repository <checkout>` for 
 8. **Report** every footprint item as removed, or kept with its reason, plus follow-ups
    still owed (deploy check, Sentry issue). End with whether the session is safe to
    close.
+9. **Archive the session** once the report says it is safe to close. In the desktop app,
+   load `mcp__ccd_session_mgmt__archive_session` with ToolSearch and call it with `self`.
+   Elsewhere, run `close-session.py stop-background`; when it prints `✗ not a background
+   session`, tell me to close it. Either one ends the conversation, so the report goes
+   first. Done when the session is archived or stopped, or I've been told to close it.

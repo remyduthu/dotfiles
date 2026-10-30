@@ -57,4 +57,4 @@ goes straight to In Progress because Step 3 starts the work now.
 `/ship-issue` re-reads the issue from Linear, so the handover is the issue itself — the
 idea survives even if this session ends here.
 
-**Done when:** `/ship-issue` has reported its PRs, green.
+**Done when:** `/ship-issue` has landed its PRs.

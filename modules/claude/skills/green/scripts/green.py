@@ -105,6 +105,23 @@ def fold(arguments):
 POLL_SECONDS = 60
 
 
+def read_signal(arguments):
+    """Each PR's SIGNAL line from the unblocking skill's pr-state script, with its fields parsed."""
+    signal = run(
+        ["python3", arguments.pr_state, "--signal", *arguments.prs],
+        cwd=arguments.worktree,
+        check=False,
+        capture=True,
+    )
+    lines = [line for line in signal.stdout.splitlines() if line.startswith("SIGNAL ")]
+    # pr-state prints a line even for a PR it cannot read, so none means it crashed.
+    if not lines:
+        sys.stderr.write(signal.stderr or "")
+        fail(f"pr-state printed no signal (exit {signal.returncode}).")
+    states = [dict(field.split("=", 1) for field in line.split()[1:]) for line in lines]
+    return lines, states
+
+
 def wait(arguments):
     """Poll the PRs until their checks settle or one has a fix to make, then print where each one stands.
 
@@ -113,18 +130,7 @@ def wait(arguments):
     """
     deadline = time.monotonic() + arguments.timeout
     while True:
-        signal = run(
-            ["python3", arguments.pr_state, "--signal", *arguments.prs],
-            cwd=arguments.worktree,
-            check=False,
-            capture=True,
-        )
-        lines = [line for line in signal.stdout.splitlines() if line.startswith("SIGNAL ")]
-        # pr-state prints a line even for a PR it cannot read, so none means it crashed.
-        if not lines:
-            sys.stderr.write(signal.stderr or "")
-            fail(f"pr-state printed no signal (exit {signal.returncode}).")
-        states = [dict(field.split("=", 1) for field in line.split()[1:]) for line in lines]
+        lines, states = read_signal(arguments)
         # A check still running, or none registered yet, can change the verdict.
         settling = len(states) < len(arguments.prs) or any(
             state["action"] != "done" and state["ci"] in ("pending", "none")
@@ -143,6 +149,64 @@ def wait(arguments):
     else:
         verdict = "green"
     print("\n".join(lines))
+    print(f"VERDICT: {verdict}")
+
+
+# --- watch -------------------------------------------------------------------
+
+# Waiting on a human merge: minutes of latency cost nothing, GitHub quota does.
+WATCH_POLL_SECONDS = 300
+# What says someone has work: a new commit, a new action, new feedback. The other fields
+# (rebase, reviews, ci) also move when trunk moves or a reviewer approves.
+WATCHED_FIELDS = ("pr", "sha", "action", "anhash", "rthash", "fbhash")
+
+
+def closed_unmerged(arguments):
+    """The PRs closed without merging, which no amount of waiting will land."""
+    # A failed read is not a closed PR: the next poll asks again.
+    return [
+        pr
+        for pr in arguments.prs
+        if run(
+            ["gh", "pr", "view", pr, "--json", "state", "--jq", ".state"],
+            cwd=arguments.worktree,
+            check=False,
+            capture=True,
+        ).stdout.strip()
+        == "CLOSED"
+    ]
+
+
+def watch(arguments):
+    """Wait on a green stack until every PR merges, one closes without merging, or one moves."""
+    deadline = time.monotonic() + arguments.timeout
+    first = None
+    closed = []
+    while True:
+        lines, states = read_signal(arguments)
+        actions = {state["action"] for state in states}
+        watched = [{field: state.get(field) for field in WATCHED_FIELDS} for state in states]
+        # An unreadable PR says nothing about the stack, so it never becomes the baseline.
+        if first is None and "unknown" not in actions:
+            first = watched
+        if len(states) == len(arguments.prs) and actions == {"done"}:
+            verdict = "merged"
+        elif "fix" in actions or (
+            first is not None and "unknown" not in actions and watched != first
+        ):
+            verdict = "moved"
+        elif closed := closed_unmerged(arguments):
+            verdict = "closed"
+        elif time.monotonic() >= deadline:
+            verdict = "open"
+        else:
+            time.sleep(WATCH_POLL_SECONDS)
+            continue
+        break
+
+    print("\n".join(lines))
+    if closed:
+        print(f"CLOSED: {' '.join(closed)}")
     print(f"VERDICT: {verdict}")
 
 
@@ -167,6 +231,12 @@ def main():
     sub.add_argument("--pr-state", type=Path, required=True, help="The unblocking skill's scripts/pr-state.py.")
     sub.add_argument("--prs", nargs="+", required=True)
     sub.add_argument("--timeout", type=int, default=480, help="Seconds to wait before returning.")
+
+    sub = add("watch", watch, help="Wait on a green stack until it merges, closes, or moves; print a verdict.")
+    sub.add_argument("--worktree", type=Path, required=True)
+    sub.add_argument("--pr-state", type=Path, required=True, help="The unblocking skill's scripts/pr-state.py.")
+    sub.add_argument("--prs", nargs="+", required=True)
+    sub.add_argument("--timeout", type=int, default=86400, help="Seconds to wait before returning.")
 
     arguments = parser.parse_args()
     arguments.function(arguments)
