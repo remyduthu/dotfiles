@@ -21,3 +21,4 @@ __screenshots__
 docs/superpowers/
 
 **/.claude/settings.local.json
+**/.claude/launch.json
