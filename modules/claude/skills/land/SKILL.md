@@ -33,8 +33,8 @@ you hold each worktree's path and the pr-state script `/green` waited with.
 
 ## Step 2 — Watch for the merge
 
-Start one watch per worktree, each with `run_in_background`: a watch costs nothing until it
-exits and wakes you.
+Start one watch per worktree, each with `run_in_background`, then end your turn: the
+session stays mine to talk in, and a watch costs nothing until it exits and wakes you.
 
 ```bash
 $GREEN watch --worktree <worktree> --pr-state <pr-state script> --prs <n> [<n> …]

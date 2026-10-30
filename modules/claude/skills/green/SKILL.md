@@ -62,8 +62,9 @@ differ, they win.
 $GREEN wait --worktree "$WT" --pr-state <its base directory>/scripts/pr-state.py --prs <n> [<n> …]
 ```
 
-Give the call a 600000 ms Bash timeout: it waits up to eight minutes for checks to settle,
-then prints one `SIGNAL` line per PR and `VERDICT: green|work|waiting`.
+Run it with `run_in_background`, then end your turn: the session stays mine to talk in while
+it waits, and its exit wakes you. Keep one wait running per worktree. It waits up to eight minutes for checks to settle, then
+prints one `SIGNAL` line per PR and `VERDICT: green|work|waiting`.
 
 - **`waiting`** — call it again, unless a PR reads `ci=none` after a full wait or
   `action=unknown` across two waits: a fork.
