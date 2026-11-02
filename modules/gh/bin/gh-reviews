@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# List open pull requests requesting the authenticated user's review. Excludes
-# drafts, conflicts, already-approved PRs, and PRs with unresolved review
-# threads. Groups results by repository.
+# List open Mergifyio pull requests requesting the authenticated user's review.
+# Excludes drafts, conflicts, already-approved PRs, and PRs with unresolved
+# review threads. Groups results by repository.
 #
 # Usage: gh-reviews [--browse]
 #   --browse  Open all listed PRs in the browser.
@@ -19,7 +19,7 @@ fi
 # and `labels` lets the client exclude conflicts and unresolved review threads.
 # The search API's label filter is unreliable and silently drops matching PRs,
 # so that filtering happens client-side below instead.
-search_query='base:main draft:false is:open is:pr review-requested:@me sort:updated-desc'
+search_query='base:main draft:false is:open is:pr org:Mergifyio review-requested:@me sort:updated-desc'
 author_login=$(gh api user --jq .login)
 
 # shellcheck disable=SC2016
