@@ -1,0 +1,350 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one board compares every option on a shared clock; the selected option's journey runs down below it. Monochrome, but for two pastels: blue trains, green buses. */
+:root {
+  --bg: #f7f7f8; --surface: #ffffff; --raised: #f2f2f4; --ink: #0f1012; --ink-2: #5d6068; --ink-3: #9a9da4;
+  --line: #ececef; --line-strong: #d6d7db; --warn: #c2412d;
+  --train: #b9cff7; --bus: #b7e2c5;
+  --font-body: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #08090a; --surface: #0f1012; --raised: #16171a; --ink: #f4f5f6; --ink-2: #9b9ea5; --ink-3: #5f626a;
+    --line: #1b1c20; --line-strong: #2d2f34; --warn: #ff7262; --train: #4a6595; --bus: #417a56; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #08090a; --surface: #0f1012; --raised: #16171a; --ink: #f4f5f6; --ink-2: #9b9ea5; --ink-3: #5f626a;
+  --line: #1b1c20; --line-strong: #2d2f34; --warn: #ff7262; --train: #4a6595; --bus: #417a56; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 56px 72px;
+}
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 32px; }
+main > *, .compare > * { min-width: 0; }
+h1, h2 { margin: 0; }
+h1 {
+  font-size: clamp(1.9rem, 5vw, 2.75rem); font-weight: 600; letter-spacing: -0.035em; line-height: 1.05; text-wrap: balance;
+  background: linear-gradient(180deg, var(--ink) 40%, var(--ink-2)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+h2 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Toolbar. */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.toolbar-label { font-size: 0.8rem; color: var(--ink-3); }
+.segmented { display: inline-flex; padding: 3px; gap: 2px; background: var(--raised); border: 1px solid var(--line); border-radius: 9px; max-width: 100%; overflow-x: auto; }
+.segmented button {
+  border: 0; background: transparent; padding: 4px 11px; border-radius: 6px; font-size: 0.82rem; color: var(--ink-2);
+  cursor: pointer; white-space: nowrap; transition: color 0.15s, background 0.15s;
+}
+.segmented button:hover { color: var(--ink); }
+.segmented button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong), 0 1px 2px rgb(0 0 0 / 0.06); }
+
+/* Board. */
+.compare { display: grid; gap: 14px; }
+.board { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+.board-row, .board-head {
+  display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 6.5rem; gap: 24px; align-items: center;
+}
+.board-head { padding: 8px 12px 2px; }
+.board-head .label { font-size: 0.72rem; color: var(--ink-3); }
+.board-head .label:last-child { text-align: right; }
+.axis { position: relative; height: 18px; font-family: var(--font-data); font-size: 0.68rem; color: var(--ink-3); }
+.axis span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.rows { display: grid; gap: 2px; }
+.board-row {
+  width: 100%; text-align: left; border: 0; background: transparent; padding: 14px 12px; border-radius: 9px; cursor: pointer;
+  transition: background 0.15s;
+}
+.board-row:hover { background: var(--raised); }
+.board-row[aria-pressed="true"] { background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.who { display: grid; gap: 6px; min-width: 0; }
+.who-name { font-weight: 500; font-size: 0.92rem; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* A quiet pill; its dot carries the state: filled ink for the pick, red for a broken preference. */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 8px 0 7px; border-radius: 99px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2);
+  font-size: 0.72rem; font-weight: 500; letter-spacing: -0.005em; white-space: nowrap;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--ink-3); flex: none; }
+.chip.recommended { color: var(--ink); }
+.chip.recommended::before { background: var(--ink); border-color: var(--ink); }
+.chip.issue::before, .chip.over-budget::before { background: var(--warn); border-color: var(--warn); }
+.figure { display: grid; justify-items: end; gap: 1px; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.figure b { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.02em; }
+.figure span { font-size: 0.75rem; color: var(--ink-3); }
+.figure .bad { color: var(--warn); }
+
+/* Lane: a thin line from departure to arrival, with a slim bar for each ride; the gaps are the pauses. */
+.lane { position: relative; display: block; height: 24px; }
+.lane > * { position: absolute; display: block; }
+.night { top: 0; bottom: 0; background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.gridline { top: 0; bottom: 0; width: 1px; background: var(--line); }
+.baseline { top: 50%; height: 1px; margin-top: -0.5px; background: var(--line-strong); }
+.seg { top: 6px; bottom: 6px; border-radius: 4px; }
+.seg.train, .swatch.train { background: var(--train); }
+.seg.bus, .swatch.bus { background: var(--bus); }
+.swatch.night { height: 12px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+
+.crosshair { position: absolute; top: 8px; bottom: 8px; width: 1px; background: var(--ink-3); pointer-events: none; }
+.crosshair span {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-family: var(--font-data); font-size: 0.68rem;
+  background: var(--ink); color: var(--surface); padding: 1px 6px; border-radius: 4px; white-space: nowrap;
+}
+.tooltip {
+  position: absolute; z-index: 5; pointer-events: none; max-width: 18rem; display: grid; gap: 2px;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12); font-size: 0.82rem;
+}
+.tooltip time { font-family: var(--font-data); font-size: 0.75rem; color: var(--ink-2); }
+.tooltip small { color: var(--ink-3); font-size: 0.75rem; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.78rem; color: var(--ink-3); padding-inline: 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { display: inline-block; width: 18px; height: 8px; border-radius: 2px; flex: none; }
+
+/* Journey: stops down the left rail, each ride drawn as the rail between two stops, a dotted rail with its length for each pause. */
+.detail { display: grid; gap: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+.journey { list-style: none; margin: 0; padding: 0; display: grid; max-width: 640px; }
+.journey li { display: grid; grid-template-columns: 3.2rem 14px minmax(0, 1fr) auto; column-gap: 16px; align-items: center; }
+.journey time { font-family: var(--font-data); font-size: 0.8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.stop { min-height: 24px; }
+.stop .node { position: relative; z-index: 1; justify-self: center; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink-2); background: var(--surface); }
+.stop.edge .node { width: 11px; height: 11px; background: var(--ink); border-color: var(--ink); }
+.stop.edge time { color: var(--ink); }
+.stop .station { font-weight: 500; font-size: 0.92rem; letter-spacing: -0.01em; }
+/* The rail reaches under the stops' nodes so the line reads as one. */
+.leg .rail, .between .rail { justify-self: center; align-self: stretch; width: 4px; margin-block: -8px; border-radius: 2px; }
+.leg.train .rail { background: var(--train); }
+.leg.bus .rail { background: var(--bus); }
+.between .rail { width: 0; border-left: 2px dotted var(--ink-3); border-radius: 0; }
+.leg .body, .between .body { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; padding-block: 8px; font-size: 0.88rem; }
+.leg .what { color: var(--ink); }
+.journey .duration { font-family: var(--font-data); font-size: 0.76rem; color: var(--ink-3); }
+.leg small { flex-basis: 100%; color: var(--ink-3); font-size: 0.8rem; }
+.leg .price { font-family: var(--font-data); font-size: 0.8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.notes { margin: 0; padding: 0 0 0 18px; display: grid; gap: 4px; color: var(--ink-2); font-size: 0.86rem; }
+
+/* Ruled out. */
+.ruled { display: grid; gap: 12px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th, td { text-align: left; padding: 10px 16px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.72rem; color: var(--ink-3); font-weight: 500; border-top: 0; }
+td { color: var(--ink-2); }
+td:first-child { color: var(--ink); white-space: nowrap; }
+td:nth-child(2) { font-family: var(--font-data); font-size: 0.82rem; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  body { padding-block: 32px 56px; }
+  .board-head, .board-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 12px; }
+  .board-head .label { display: none; }
+  .board-head .axis, .board-row .lane { grid-column: 1 / -1; }
+  .board-row .lane { order: 3; }
+  .detail { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main id="page"></main>
+
+<script>
+const PAGE = __DATA__;
+
+const escape = (text) => String(text ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DAY = 24 * 60;
+const pad = (number) => String(Math.floor(number)).padStart(2, "0");
+const clock = (minutes) => `${pad((((minutes % DAY) + DAY) % DAY) / 60)}:${pad(((minutes % 60) + 60) % 60)}`;
+
+// Ascending keys; an unknown price sorts last.
+const SORTS = [
+  ["suggested", "Suggested", (option) => option.index],
+  ["arrival", "Arrival", (option) => option.arrival],
+  ["total", "Total time", (option) => option.arrival - option.departure],
+  ["price", "Price", (option) => option.price_value ?? Infinity],
+];
+const LEGEND = [["train", "Train"], ["bus", "Bus"], ["night", "Night, 23:00–05:00"]];
+
+PAGE.options.forEach((option, index) => {
+  option.index = index;
+  option.departure = option.legs[0].start;
+  option.arrival = option.legs[option.legs.length - 1].end;
+});
+const state = { sort: "suggested", selected: Math.max(0, PAGE.options.findIndex((option) => option.tag === "recommended")) };
+
+// One clock for every option, from the hour before the first departure to the hour after the last arrival.
+const RANGE = [
+  Math.floor(Math.min(...PAGE.options.map((option) => option.departure)) / 60) * 60,
+  Math.ceil(Math.max(...PAGE.options.map((option) => option.arrival)) / 60) * 60,
+];
+const percent = (minutes) => ((minutes - RANGE[0]) / (RANGE[1] - RANGE[0])) * 100;
+const TICKS = (() => {
+  const hours = (RANGE[1] - RANGE[0]) / 60;
+  const every = hours <= 8 ? 60 : hours <= 16 ? 120 : hours <= 30 ? 180 : 360;
+  const result = [];
+  for (let minutes = Math.ceil(RANGE[0] / every) * every; minutes < RANGE[1]; minutes += every) if (minutes > RANGE[0]) result.push(minutes);
+  return result;
+})();
+// Position from start to end on the shared clock, inset by a pixel on each side to leave a gap between neighbours.
+const at = (start, end, inset = 0) => `left:calc(${percent(start)}% + ${inset}px);width:calc(${percent(end) - percent(start)}% - ${2 * inset}px)`;
+
+function lane(option) {
+  let layers = "";
+  for (let day = Math.floor(RANGE[0] / DAY) - 1; day * DAY <= RANGE[1]; day += 1) {
+    const start = Math.max(RANGE[0], day * DAY + 23 * 60);
+    const end = Math.min(RANGE[1], (day + 1) * DAY + 5 * 60);
+    if (end > start) layers += `<span class="night" style="${at(start, end)}"></span>`;
+  }
+  layers += TICKS.map((minutes) => `<span class="gridline" style="left:${percent(minutes)}%"></span>`).join("");
+  layers += `<span class="baseline" style="${at(option.departure, option.arrival)}"></span>`;
+  layers += option.legs.map((leg, index) => `<span class="seg ${leg.class}" data-leg="${index}" style="${at(leg.start, leg.end, 1)}"></span>`).join("");
+  return `<span class="lane" role="img" aria-label="${escape(option.name)} timeline">${layers}</span>`;
+}
+
+function chips(option) {
+  const tag = `<span class="chip ${option.tag}">${escape(option.label)}</span>`;
+  // An issue the tag already names, like Over budget, shows once.
+  return tag + option.issues.filter((issue) => issue !== option.label).map((issue) => `<span class="chip issue">${escape(issue)}</span>`).join("");
+}
+
+function row(option) {
+  return `<button type="button" class="board-row" data-index="${option.index}" aria-pressed="${option.index === state.selected}">
+    <span class="who"><span class="who-name">${escape(option.name)}</span><span class="chips">${chips(option)}</span></span>
+    ${lane(option)}
+    <span class="figure"><b>${escape(option.total)}</b><span class="${option.price_warning ? "bad" : ""}">${escape(option.price)}</span></span>
+  </button>`;
+}
+
+function journey(option) {
+  let lastStation = null;
+  // A stop names its station only when the traveller has moved since the last one.
+  const stop = (minutes, station, edge) => {
+    const name = station === lastStation ? "" : station;
+    lastStation = station;
+    return `<li class="stop${edge ? " edge" : ""}"><time>${clock(minutes)}</time><span class="node"></span><span class="station">${escape(name)}</span><span></span></li>`;
+  };
+  let items = "";
+  for (const [index, leg] of option.legs.entries()) {
+    const prior = option.legs[index - 1];
+    if (prior) {
+      items += stop(prior.end, prior.destination, false);
+      items += `<li class="between" style="min-height:${Math.max(28, (leg.start - prior.end) * 0.32)}px">
+        <span></span><span class="rail"></span>
+        <span class="body"><span class="duration">${escape(leg.pause)}</span></span>
+      </li>`;
+    }
+    items += stop(leg.start, leg.origin, index === 0);
+    items += `<li class="leg ${leg.class}" style="min-height:${Math.max(36, (leg.end - leg.start) * 0.32)}px">
+      <span></span><span class="rail"></span>
+      <span class="body"><span class="what">${escape(leg.what)}</span><span class="duration">${escape(leg.duration)}</span>${leg.detail ? `<small>${escape(leg.detail)}</small>` : ""}</span>
+      <span class="price">${escape(leg.price)}</span>
+    </li>`;
+  }
+  return `<ol class="journey">${items}${stop(option.arrival, option.legs[option.legs.length - 1].destination, true)}</ol>`;
+}
+
+function detail(option) {
+  const notes = option.notes.map((note) => `<li>${escape(note)}</li>`).join("");
+  return `<h2>${escape(option.name)}</h2>${journey(option)}${notes ? `<ul class="notes">${notes}</ul>` : ""}`;
+}
+
+const rejected = PAGE.rejected.length ? `<section class="ruled"><h2>Ruled out</h2><div class="table-wrap"><table>
+  <thead><tr><th>Option</th><th>Arrival</th><th>Why not</th></tr></thead>
+  <tbody>${PAGE.rejected.map((row) => `<tr><td>${escape(row.option)}</td><td>${escape(row.arrival)}</td><td>${escape(row.reason)}</td></tr>`).join("")}</tbody>
+</table></div></section>` : "";
+
+document.getElementById("page").innerHTML = `
+  <h1>${escape(PAGE.title)}</h1>
+  <section class="compare">
+    <div class="toolbar">
+      <span class="toolbar-label" id="sort-label">Sort by</span>
+      <div class="segmented" role="group" aria-labelledby="sort-label" id="sort">${SORTS.map(([key, text]) => `<button type="button" data-key="${key}" aria-pressed="${key === state.sort}">${text}</button>`).join("")}</div>
+    </div>
+    <div class="board" id="board">
+      <div class="board-head"><span class="label">Option</span><div class="axis" id="axis">${TICKS.map((minutes) => `<span style="left:${percent(minutes)}%">${clock(minutes)}</span>`).join("")}</div><span class="label">Total</span></div>
+      <div class="rows" id="rows"></div>
+      <div class="crosshair" id="crosshair" hidden><span></span></div>
+      <div class="tooltip" id="tooltip" hidden></div>
+    </div>
+    <div class="legend" aria-hidden="true">${LEGEND.map(([css, label]) => `<span><i class="swatch ${css}"></i>${label}</span>`).join("")}</div>
+  </section>
+  <section class="detail" id="detail" aria-live="polite"></section>
+  ${rejected}`;
+
+const board = document.getElementById("board");
+const rows = document.getElementById("rows");
+const axis = document.getElementById("axis");
+const crosshair = document.getElementById("crosshair");
+const tooltip = document.getElementById("tooltip");
+
+function drawBoard() {
+  const key = SORTS.find(([name]) => name === state.sort)[2];
+  const ordered = [...PAGE.options].sort((first, second) => key(first) - key(second) || first.index - second.index);
+  // Animate rows from their old place to their new one.
+  const before = new Map([...rows.children].map((element) => [element.dataset.index, element.getBoundingClientRect().top]));
+  rows.innerHTML = ordered.map(row).join("");
+  if (reducedMotion) return;
+  for (const element of rows.children) {
+    const top = before.get(element.dataset.index);
+    if (top === undefined) continue;
+    const delta = top - element.getBoundingClientRect().top;
+    if (delta) element.animate([{ transform: `translateY(${delta}px)` }, { transform: "none" }], { duration: 260, easing: "cubic-bezier(0.2, 0, 0, 1)" });
+  }
+}
+
+function drawDetail() {
+  document.getElementById("detail").innerHTML = detail(PAGE.options[state.selected]);
+  for (const element of rows.children) element.setAttribute("aria-pressed", String(Number(element.dataset.index) === state.selected));
+}
+
+document.getElementById("sort").addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button || state.sort === button.dataset.key) return;
+  state.sort = button.dataset.key;
+  for (const other of button.parentElement.children) other.setAttribute("aria-pressed", String(other === button));
+  drawBoard();
+});
+
+rows.addEventListener("click", (event) => {
+  const element = event.target.closest(".board-row");
+  if (!element) return;
+  state.selected = Number(element.dataset.index);
+  drawDetail();
+});
+
+// Crosshair across every row, and a tooltip on the ride under the pointer.
+board.addEventListener("pointermove", (event) => {
+  const area = axis.getBoundingClientRect();
+  const box = board.getBoundingClientRect();
+  const inside = event.clientX >= area.left && event.clientX <= area.right;
+  crosshair.hidden = !inside;
+  if (inside) {
+    crosshair.style.left = `${event.clientX - box.left}px`;
+    crosshair.firstElementChild.textContent = clock(RANGE[0] + ((event.clientX - area.left) / area.width) * (RANGE[1] - RANGE[0]));
+  }
+  const segment = event.target.closest(".seg");
+  tooltip.hidden = !segment;
+  if (!segment) return;
+  const leg = PAGE.options[Number(segment.closest(".board-row").dataset.index)].legs[Number(segment.dataset.leg)];
+  tooltip.innerHTML = `<time>${clock(leg.start)}–${clock(leg.end)}</time><strong>${escape(leg.what)}</strong><small>${escape([`${leg.origin} → ${leg.destination}`, leg.duration, leg.price].join(" · "))}</small>`;
+  const x = Math.min(event.clientX - box.left + 14, box.width - tooltip.offsetWidth - 8);
+  tooltip.style.left = `${Math.max(8, x)}px`;
+  tooltip.style.top = `${event.clientY - box.top + 16}px`;
+});
+board.addEventListener("pointerleave", () => { crosshair.hidden = true; tooltip.hidden = true; });
+
+drawBoard();
+drawDetail();
+</script>

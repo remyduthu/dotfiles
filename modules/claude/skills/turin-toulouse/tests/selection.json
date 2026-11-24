@@ -1,0 +1,26 @@
+{
+  "options": [
+    {
+      "id": "d9fdab53",
+      "name": "A. Day bus, pauses in Lyon and Montpellier",
+      "tag": "recommended",
+      "notes": [
+        "Only 3 seats left at €77 on the 14:10 TGV."
+      ]
+    },
+    {
+      "id": "3bed05d1",
+      "name": "B. Night bus, then the direct TGV",
+      "tag": "fallback",
+      "label": "Night",
+      "notes": []
+    }
+  ],
+  "rejected": [
+    {
+      "option": "Direct TGV Lyon → Toulouse 14:10",
+      "arrival": "19:16",
+      "reason": "Sold out."
+    }
+  ]
+}

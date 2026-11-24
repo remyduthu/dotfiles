@@ -1,0 +1,37 @@
+{
+  "direction": "turin-toulouse",
+  "date": "2030-01-17",
+  "flex_days": 1,
+  "arrive_by": "2030-01-17T23:59",
+  "legs": [
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-16T22:40", "arrive": "2030-01-17T03:00", "mode": "bus", "operator": "Itabus", "price": 15},
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-16T23:30", "arrive": "2030-01-17T03:55", "mode": "bus", "operator": "Flixbus", "price": 16},
+    {"from": "Turin", "to": "Toulouse Matabiau", "depart": "2030-01-16T23:15", "arrive": "2030-01-17T11:50", "mode": "bus", "operator": "Flixbus", "price": 50},
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-17T00:10", "arrive": "2030-01-17T04:35", "mode": "bus", "operator": "Itabus", "price": 13},
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-17T04:25", "arrive": "2030-01-17T08:45", "mode": "bus", "operator": "Flixbus", "price": 21},
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-17T07:45", "arrive": "2030-01-17T12:00", "mode": "bus", "operator": "Flixbus", "price": 18},
+    {"from": "Turin Stura", "to": "Lyon Gerland", "depart": "2030-01-17T08:00", "arrive": "2030-01-17T13:00", "mode": "bus", "operator": "Itabus", "price": 15},
+    {"from": "Turin", "to": "Lyon Gerland", "depart": "2030-01-17T09:30", "arrive": "2030-01-17T14:10", "mode": "bus", "operator": "Flixbus", "price": 21},
+    {"from": "Turin Porta Susa", "to": "Lyon Part-Dieu", "depart": "2030-01-17T07:36", "arrive": "2030-01-17T13:03", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 87},
+
+    {"from": "Lyon Part-Dieu", "to": "Toulouse Matabiau", "depart": "2030-01-17T06:40", "arrive": "2030-01-17T10:52", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 46},
+    {"from": "Lyon Part-Dieu", "to": "Toulouse Matabiau", "depart": "2030-01-17T12:10", "arrive": "2030-01-17T16:20", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 101},
+    {"from": "Lyon Part-Dieu", "to": "Toulouse Matabiau", "depart": "2030-01-17T13:10", "arrive": "2030-01-17T19:04", "mode": "train", "operator": "SNCF", "price": null},
+    {"from": "Lyon Part-Dieu", "to": "Toulouse Matabiau", "depart": "2030-01-17T14:10", "arrive": "2030-01-17T19:16", "mode": "high-speed-train", "operator": "TGV INOUI", "price": null, "full": true},
+
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Sud-de-France", "depart": "2030-01-17T09:40", "arrive": "2030-01-17T11:21", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 30},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Saint-Roch", "depart": "2030-01-17T11:05", "arrive": "2030-01-17T12:52", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 45},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Sud-de-France", "depart": "2030-01-17T11:10", "arrive": "2030-01-17T12:54", "mode": "high-speed-train", "operator": "OUIGO", "price": 16},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Saint-Roch", "depart": "2030-01-17T12:10", "arrive": "2030-01-17T14:02", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 48},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Sud-de-France", "depart": "2030-01-17T14:10", "arrive": "2030-01-17T15:50", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 77},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Saint-Roch", "depart": "2030-01-17T14:20", "arrive": "2030-01-17T18:11", "mode": "train", "operator": "TER", "price": null},
+    {"from": "Lyon Part-Dieu", "to": "Montpellier Saint-Roch", "depart": "2030-01-17T17:10", "arrive": "2030-01-17T19:08", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 77},
+
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T15:05", "arrive": "2030-01-17T17:18", "mode": "train", "operator": "Intercités", "price": 40},
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T16:13", "arrive": "2030-01-17T19:04", "mode": "train", "operator": "TER liO", "price": 43.2},
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T17:05", "arrive": "2030-01-17T19:16", "mode": "train", "operator": "Intercités", "price": null, "full": true},
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T17:53", "arrive": "2030-01-17T20:41", "mode": "train", "operator": "TER liO", "price": 43.2, "changes": [{"at": "Narbonne", "minutes": 10}]},
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T19:05", "arrive": "2030-01-17T21:19", "mode": "train", "operator": "Intercités", "price": 41},
+    {"from": "Montpellier Saint-Roch", "to": "Toulouse Matabiau", "depart": "2030-01-17T20:07", "arrive": "2030-01-17T22:19", "mode": "high-speed-train", "operator": "TGV INOUI", "price": 37}
+  ]
+}
